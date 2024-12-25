@@ -1,8 +1,7 @@
-import { Geist, Geist_Mono,Outfit } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({
-  // variable: "--font-geist-mono",
   subsets: ["latin"],
   weight:["400","500","600","700"]
 });
