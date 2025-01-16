@@ -16,7 +16,7 @@ const Header = () => {
                     <p className="mt-1 mb-5 max-w-[740px] m-auto text-xs sm:text-base">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vel natus ullam perferendis ut ratione eum asperiores sunt quibusdam nisi quam?</p>
                     <button className="flex items-center gap-2 font-medium py-1 px-3 sm:px-6 sm:py-3 border border-solid border-black ">Get start <Image src={assets.arrow} alt=''></Image></button>
                 </div>
-                <Image src={assets.test} width={700} alt='' className="border w-[160px] sm:h-auto sm:w-auto"/>
+                <Image src={assets.man} width={500} alt='' className="border w-[160px] sm:h-auto sm:w-auto"/>
             </div>
             <div className="flex justify-between item-center border-black border-solid">
              <form action="" className="flex justify-between max-w-[500px] scale-75 sm:scale-100 mx-auto mt-10 border border-black shadow-[-7px_7px_0px_#000000]">
