@@ -19,12 +19,14 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={outfit.className}>
         <div className="flex">
-          <Sidebar />
+          <div className="sticky top-0 h-screen"> {/* เพิ่ม sticky และ top-0 */}
+            <Sidebar />
+          </div>
           <div className="flex flex-col w-full">
-
             {children}
           </div>
         </div>
+
       </body>
     </html>
   );

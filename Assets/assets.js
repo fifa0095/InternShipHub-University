@@ -28,6 +28,7 @@ import upload_area from './upload_area.png'
 import test from "./test.png"
 import man from "./man.jpg"
 import home_icon from "./home_icon.png"
+import menu_icon from "./menu_icon.png"
 
 export const assets = {
     facebook_icon,
@@ -43,7 +44,8 @@ export const assets = {
     upload_area,
     test,
     man,
-    home_icon
+    home_icon,
+    menu_icon,
     }
 
     export const blog_data = [{
