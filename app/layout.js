@@ -1,9 +1,12 @@
 import { Outfit } from "next/font/google";
+import Sidebar from "@/Components/ClientSidebar/Sidebar";
 import "./globals.css";
+import { assets } from "@/Assets/assets";
+import Image from "next/image";
 
 const outfit = Outfit({
   subsets: ["latin"],
-  weight:["400","500","600","700"]
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata = {
@@ -14,8 +17,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={outfit.className}>{children}
+      <body className={outfit.className}>
+        <div className="flex">
+          <Sidebar />
+          <div className="flex flex-col w-full">
+
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );

@@ -3,6 +3,8 @@
 import BlogList from "@/Components/BlogList";
 import Header from "@/Components/Header";
 import Footer from "@/Components/Footer";
+import Sidebar from "@/Components/ClientSidebar/Sidebar";
+
 
 export default function Home() {
   return (
@@ -10,6 +12,7 @@ export default function Home() {
     <Header/>
     <BlogList/>
     <Footer/>
+    {/* mainPage */}
     </>
   );
 }
