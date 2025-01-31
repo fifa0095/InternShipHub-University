@@ -3,6 +3,7 @@ import Sidebar from "@/Components/ClientSidebar/Sidebar";
 import "./globals.css";
 import { assets } from "@/Assets/assets";
 import Image from "next/image";
+import { ToastContainer } from "react-toastify";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={outfit.className}>
         <div className="flex">
+          <ToastContainer theme="dark"/>
           <div className="sticky top-0 h-screen"> {/* เพิ่ม sticky และ top-0 */}
             <Sidebar />
           </div>
