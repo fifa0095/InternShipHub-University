@@ -50,31 +50,31 @@ export const assets = {
 
     export const blog_data = [{
         id:1,
-        title:"A detailed step by step guide to manage your lifestyle",
+        title:"A detailed step by step guide to manage your Developer",
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_1,
         date:Date.now(),
-        category:"Lifestyle",
+        category:"Developer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
     {
         id:2,
-        title:"How to create an effective startup roadmap or ideas",
+        title:"How to create an effective Developer roadmap or ideas",
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_2,
         date:Date.now(),
-        category:"Startup",
+        category:"Developer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
     {
         id:3,
-        title:"Learning new technology to boost your career in software",
+        title:"Learning new Cybersecurity to boost your career in software",
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_3,
         date:Date.now(),
-        category:"Technology",
+        category:"Cybersecurity",
         author:"Alex Bennett",
         author_img:profile_icon
     },
@@ -84,7 +84,7 @@ export const assets = {
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_4,
         date:Date.now(),
-        category:"Technology",
+        category:"Cybersecurity",
         author:"Alex Bennett",
         author_img:profile_icon
     },
@@ -94,37 +94,37 @@ export const assets = {
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_5,
         date:Date.now(),
-        category:"Lifestyle",
+        category:"Developer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
     {
         id:6,
-        title:"Maximizing returns by minimizing resources in your startup",
+        title:"Maximizing returns by minimizing resources in your Ux/UI Designer",
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_6,
         date:Date.now(),
-        category:"Startup",
+        category:"Designer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
     {
         id:7,
-        title:"Technology for Career advancement in development",
+        title:"Cybersecurity for Career advancement in development",
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_7,
         date:Date.now(),
-        category:"Technology",
+        category:"Cybersecurity",
         author:"Alex Bennett",
         author_img:profile_icon
     },
     {
         id:8,
-        title:"A comprehensive roadmap for effective lifestyle management",
+        title:"A comprehensive roadmap for effective Developer management",
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_8,
         date:Date.now(),
-        category:"Lifestyle",
+        category:"Developer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
@@ -134,27 +134,27 @@ export const assets = {
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_9,
         date:Date.now(),
-        category:"Startup",
+        category:"Designer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
     {
         id:10,
-        title:"Beyond the Ordinary: Crafting Your Exceptional Lifestyle",
+        title:"Beyond the Ordinary: Crafting Your Exceptional Developer",
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_10,
         date:Date.now(),
-        category:"Lifestyle",
+        category:"Developer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
     {
         id:11,
-        title:"Unveiling the Secrets of Successful Startups in Technolgy",
+        title:"Unveiling the Secrets of Successful Designers in Technolgy",
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_11,
         date:Date.now(),
-        category:"Startup",
+        category:"Designer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
@@ -164,7 +164,7 @@ export const assets = {
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_12,
         date:Date.now(),
-        category:"Technology",
+        category:"Cybersecurity",
         author:"Alex Bennett",
         author_img:profile_icon
     },
@@ -174,7 +174,7 @@ export const assets = {
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_13,
         date:Date.now(),
-        category:"Startup",
+        category:"Designer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
@@ -184,7 +184,7 @@ export const assets = {
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_14,
         date:Date.now(),
-        category:"Lifestyle",
+        category:"Developer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
@@ -194,7 +194,7 @@ export const assets = {
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_15,
         date:Date.now(),
-        category:"Technology",
+        category:"Cybersecurity",
         author:"Alex Bennett",
         author_img:profile_icon
     },
@@ -204,7 +204,7 @@ export const assets = {
         description:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the..",
         image:blog_pic_16,
         date:Date.now(),
-        category:"Startup",
+        category:"Designer",
         author:"Alex Bennett",
         author_img:profile_icon
     },
