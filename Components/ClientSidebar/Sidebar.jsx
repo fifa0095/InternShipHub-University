@@ -21,7 +21,7 @@ const Sidebar = () => {
   return (
     <div className="relative">
       {/* ปุ่ม toggle สำหรับการซ่อน/แสดง Sidebar */}
-      <div className={`absolute top-3 left-3 z-10 ${isSidebarHidden ? 'w-28 sm:w-80' : 'w-28 sm:w-80'}`}>
+      <div className=  {`absolute top-3 left-3 z-[-100] ${isSidebarHidden ? 'w-28 sm:w-80' : 'w-28 sm:w-80'}`}>
         <Image 
           src={assets.menu_icon} 
           width={30}
@@ -33,9 +33,18 @@ const Sidebar = () => {
       </div>
 
       {/* Sidebar */}
-      <div className={`flex flex-col bg-slate-100 min-h-screen ${isSidebarHidden ? 'w-0 z-[-100]' : 'w-28 sm:w-80'} transition-all duration-300`}>
-        <div className="flex px-2 sm:pl-14 py-3 bg-white justify-around">
-            <Image src={assets.logo} className=' ' width={100} alt='' />
+      <div className={`flex flex-col bg-slate-100 min-h-screen ${isSidebarHidden ? 'w-0' : 'w-28 sm:w-80'} transition-all duration-300`}>
+        <div className={`flex px-2 sm:pl-14 py-3 border bg-white border-black justify-between ${isSidebarHidden ? 'hidden' : ''} transition-all duration-300`}>
+            <Image src={assets.logo} className=' ' width={110} alt='' />
+            <Image 
+              src={assets.menu_icon} 
+              width={30}
+              height={20}  
+              alt='Toggle Sidebar' 
+              className="cursor-pointer {`absolute top-3 left-3 z-10 ${isSidebarHidden ? 'hidden' : ''}`}" 
+              onClick={toggleSidebar} 
+            />
+       
         </div>
 
         {/* เนื้อหาภายใน Sidebar */}
@@ -58,6 +67,7 @@ const Sidebar = () => {
             <Link 
               href={`/blogList`} 
               className={`mt-5 flex items-center border border-black gap-3 font-medium px-3 py-2 ${activeMenu === 'blogList' ?'bg-black text-white shadow-[-5px_5px_0px_#EC8714]' : 'bg-white text-black shadow-[-5px_5px_0px_#000000]'} `}
+              onClick={() => handleMenuClick('blogList')}
             >
               <Image src={assets.blog_icon} alt='' width={28}/><p>Blog lists</p>
             </Link>
