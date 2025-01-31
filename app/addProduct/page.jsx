@@ -2,6 +2,9 @@
 import { assets } from "@/Assets/assets";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import axios from "axios";
+import { toast } from "react-toastify";
+
 
 const Page = () => {
   const [image, setImage] = useState(null);
@@ -16,7 +19,6 @@ const Page = () => {
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
     setData((prev) => ({ ...prev, [name]: value }));
-    console.log(data);
   };
 
   const onImageChange = (e) => {
@@ -34,18 +36,37 @@ const Page = () => {
     };
   }, [image]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", data.description);
-    formData.append("category", data.category);
-    formData.append("author", data.author);
-    formData.append("authorImg", data.authorImg);
-    if (image) formData.append("image", image);
+    
+    try {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description);
+      formData.append("category", data.category);
+      formData.append("author", data.author);
+      formData.append("authorImg", data.authorImg);
+      if (image) formData.append("image", image);
 
-    console.log("Form Submitted", formData);
-    // ส่งไปยัง backend API
+      const response = await axios.post("/api/blog", formData);
+
+      if (response.data.success) {
+        toast.success(response.data.msg);
+        setImage(false);
+        setData({
+          title: "",
+          description: "",
+          category: "Developer",
+          author: "Tanaton benten",
+          authorImg: "/author_img.png",
+        });
+      } else {
+        toast.error("Failed to submit blog");
+      }
+    } catch (error) {
+      console.error("Error submitting blog:", error);
+      toast.error("An error occurred while submitting the blog.");
+    }
   };
 
   return (
