@@ -9,11 +9,29 @@ const LoadDB = async () => {
 };
 
 LoadDB();
-
+// api endpoint for get all blogs
 export async function GET(request) {
-  return NextResponse.json({ msg: "API Working" }, { status: 200 });
+  try {
+    const { searchParams } = new URL(request.url);
+    const blogId = searchParams.get("id");
+
+    if (blogId) {
+      const blog = await BlogModel.findById(blogId);
+      if (!blog) {
+        return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+      }
+      return NextResponse.json(blog);
+    }
+
+    const blogs = await BlogModel.find({});
+    return NextResponse.json({ blogs });
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
 
+// api enpoint for uploading blog
 export async function POST(request) {
   try {
     const formData = await request.formData();
