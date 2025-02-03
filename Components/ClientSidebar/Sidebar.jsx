@@ -78,6 +78,20 @@ const Sidebar = () => {
             >
               <Image src={assets.email_icon} alt='' width={28}/><p>Subscription</p>
             </Link>
+            <Link 
+              href={`/prediction`} 
+              className={`mt-5 flex items-center border border-black gap-3 font-medium px-3 py-2 ${activeMenu === 'prediction' ?'bg-black text-white shadow-[-5px_5px_0px_#EC8714]' : 'bg-white text-black shadow-[-5px_5px_0px_#000000]'} `}
+              onClick={() => handleMenuClick('prediction')}
+            >
+              <Image src={assets.email_icon} alt='' width={28}/><p>ML Prediction</p>
+            </Link>
+            <Link 
+              href={`/exploreCom`} 
+              className={`mt-5 flex items-center border border-black gap-3 font-medium px-3 py-2 ${activeMenu === 'exploreCom' ?'bg-black text-white shadow-[-5px_5px_0px_#EC8714]' : 'bg-white text-black shadow-[-5px_5px_0px_#000000]'} `}
+              onClick={() => handleMenuClick('exploreCom')}
+            >
+              <Image src={assets.email_icon} alt='' width={28}/><p>Explore Company</p>
+            </Link>
           </div>
         </div>
       </div>

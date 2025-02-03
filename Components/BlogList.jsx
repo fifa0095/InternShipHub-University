@@ -1,38 +1,66 @@
-import { blog_data } from '@/Assets/assets'
-import React, { useEffect, useState } from 'react'
-import BlogItem from './BlogItem'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react';
+import BlogItem from './BlogItem';
+import axios from 'axios';
 
 const BlogList = () => {
-    const [menu,setMenu] = useState("All");
-    const [blogs,setBlogs] = useState([]);
+    const [menu, setMenu] = useState("All");
+    const [blogs, setBlogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const fetchBlogs = async () =>{
-        const response = await axios.get('/api/blog');
-        setBlogs(response.data.blogs);
-        console.log(response.data.blogs);
-    }
-    useEffect(() =>{
+    const fetchBlogs = async () => {
+        try {
+            const response = await axios.get('/api/blog');
+            if (response.data && Array.isArray(response.data.blogs)) {
+                setBlogs(response.data.blogs);
+            } else {
+                throw new Error("Invalid response format");
+            }
+        } catch (err) {
+            console.error("Error fetching blogs:", err);
+            setError("Failed to load blogs. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchBlogs();
-    },[])
-    
-  return (
-    <div>
-        <div className="flex justify-center gap-6 my-10">
-            <button onClick={()=>setMenu("All")} className={menu=="All"?'bg-black text-white py-1 px-4 rounded-sm':""}>All</button>
-            <button onClick={()=>setMenu("Developer")} className={menu=="Developer"?'bg-black text-white py-1 px-4 rounded-sm':""}>Developer</button>
-            <button onClick={()=>setMenu("Designer")} className={menu=="Designer"?'bg-black text-white py-1 px-4 rounded-sm':""}>Designer</button>
-            <button onClick={()=>setMenu("Cybersecurity")} className={menu=="Cybersecurity"?'bg-black text-white py-1 px-4 rounded-sm':""}>Cybersecurity</button>
-            <button onClick={()=>setMenu("Data Analyst")} className={menu=="Data Analyst"?'bg-black text-white py-1 px-4 rounded-sm':""}>Data Analyst</button>
+    }, []);
 
-        </div> 
-        <div className="flex flex-wrap justify-around gap-1 gap-y-10 mb-16 xl:mx-24">
-            {blogs.filter((item)=>menu==="All"?true:item.category===menu).map((item,index)=>{
-                return <BlogItem key={index} id={item.id} image={item.image} description={item.description} title={item.title} category={item.category}/>
-            })}
+    return (
+        <div>
+            <div className="flex justify-center gap-6 my-10">
+                {["All", "Developer", "Designer", "Cybersecurity", "Data Analyst"].map((category) => (
+                    <button
+                        key={category}
+                        onClick={() => setMenu(category)}
+                        className={menu === category ? 'bg-black text-white py-1 px-4 rounded-sm' : ""}
+                    >
+                        {category}
+                    </button>
+                ))}
+            </div>
+
+            {loading && <p className="text-center">Loading blogs...</p>}
+            {error && <p className="text-center text-red-500">{error}</p>}
+
+            <div className="flex flex-wrap justify-around gap-1 gap-y-10 mb-16 xl:mx-24">
+                {blogs
+                    .filter((item) => menu === "All" || item.category === menu)
+                    .map((item) => (
+                        <BlogItem
+                            key={item._id} // ใช้ _id แทน id
+                            id={item._id}  // MongoDB ใช้ _id
+                            image={item.image}
+                            description={item.description}
+                            title={item.title}
+                            category={item.category}
+                        />
+                    ))}
+            </div>
         </div>
-    </div>
-  )
-}
+    );
+};
 
-export default BlogList
+export default BlogList;

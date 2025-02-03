@@ -9,7 +9,7 @@ const LoadDB = async () => {
 };
 
 LoadDB();
-// api endpoint for get all blogs
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -30,6 +30,7 @@ export async function GET(request) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
 
 // api enpoint for uploading blog
 export async function POST(request) {
