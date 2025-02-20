@@ -64,7 +64,7 @@ const Sidebar = () => {
             >
               <Image src={assets.add_icon} alt='' width={28}/><p>Add blogs</p>
             </Link>
-            <Link 
+            {/* <Link 
               href={`/blogList`} 
               className={`mt-5 flex items-center border border-black gap-3 font-medium px-3 py-2 ${activeMenu === 'blogList' ?'bg-black text-white shadow-[-5px_5px_0px_#EC8714]' : 'bg-white text-black shadow-[-5px_5px_0px_#000000]'} `}
               onClick={() => handleMenuClick('blogList')}
@@ -77,7 +77,7 @@ const Sidebar = () => {
               onClick={() => handleMenuClick('subscription')}
             >
               <Image src={assets.email_icon} alt='' width={28}/><p>Subscription</p>
-            </Link>
+            </Link> */}
             <Link 
               href={`/prediction`} 
               className={`mt-5 flex items-center border border-black gap-3 font-medium px-3 py-2 ${activeMenu === 'prediction' ?'bg-black text-white shadow-[-5px_5px_0px_#EC8714]' : 'bg-white text-black shadow-[-5px_5px_0px_#000000]'} `}
@@ -86,9 +86,9 @@ const Sidebar = () => {
               <Image src={assets.email_icon} alt='' width={28}/><p>ML Prediction</p>
             </Link>
             <Link 
-              href={`/exploreCom`} 
-              className={`mt-5 flex items-center border border-black gap-3 font-medium px-3 py-2 ${activeMenu === 'exploreCom' ?'bg-black text-white shadow-[-5px_5px_0px_#EC8714]' : 'bg-white text-black shadow-[-5px_5px_0px_#000000]'} `}
-              onClick={() => handleMenuClick('exploreCom')}
+              href={`/companies`} 
+              className={`mt-5 flex items-center border border-black gap-3 font-medium px-3 py-2 ${activeMenu === 'companies' ?'bg-black text-white shadow-[-5px_5px_0px_#EC8714]' : 'bg-white text-black shadow-[-5px_5px_0px_#000000]'} `}
+              onClick={() => handleMenuClick('companies')}
             >
               <Image src={assets.email_icon} alt='' width={28}/><p>Explore Company</p>
             </Link>
