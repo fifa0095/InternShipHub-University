@@ -24,6 +24,12 @@ import logo_light from './logo_light.png'
 import blog_icon from './blog_icon.png'
 import add_icon from './add_icon.png'
 import email_icon from './email_icon.png'
+import login_icon from './login_icon.png'
+import camera_icon from './camera_icon.png'
+import edit_icon from './edit_icon.png'
+import delete_icon from './delete_icon.png'
+import blog_sample_1 from './blog_sample_1.png'
+import blog_sample_2 from './blog_sample_2.png'
 import upload_area from './upload_area.png'
 import test from "./test.png"
 import man from "./man.jpg"
@@ -41,6 +47,12 @@ export const assets = {
     blog_icon,
     add_icon,
     email_icon,
+    login_icon,
+    camera_icon,
+    edit_icon,
+    delete_icon,
+    blog_sample_1,
+    blog_sample_2,
     upload_area,
     test,
     man,
