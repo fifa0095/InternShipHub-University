@@ -2,20 +2,21 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
-const Page = () => {
+const EditBlogPage = () => {
   const [image, setImage] = useState(null);
   const [data, setData] = useState({
-    title: "",
-    description: "",
-    category: [],
-    company: "",
-    sourceLink: "",
-    jobDetails: [],
+    title: "Agoda Summer Internship! ☀️",
+    description:
+      "Agoda Summer Internship is back for the 2023 season! ☀️\n\nJoin us for the 10-week internship program at Agoda Bangkok...",
+    category: ["Developer", "Security"],
+    company: "AGODA",
+    sourceLink: "https://lnkd.in/gT_2zC-X",
+    jobDetails: ["Allowance", "Onsite"],
   });
-  
+
   const jobDetailOptions = ["Allowance", "Onsite", "Remote", "Hybrid"];
   const careerOptions = ["Developer", "Security", "Web Designer", "Data & AI", "QA & Tester"];
-  const companies = ["AGODA", "Google", "Microsoft", "Amazon","Other"];
+  const companies = ["AGODA", "Google", "Microsoft", "Amazon", "Other"];
 
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
@@ -48,27 +49,28 @@ const Page = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Submitted", data);
+    console.log("Blog Updated", data);
+  };
+
+  const handleDelete = () => {
+    console.log("Blog Deleted");
   };
 
   return (
     <div className="p-8 w-full">
-      <h1 className="text-2xl font-bold">Create Blog</h1>
+      <h1 className="text-2xl font-bold">Edit Blog</h1>
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        {/* Blog Title */}
         <div>
           <label className="font-bold">Blog Title <span className="text-red-500">*</span></label>
           <input
             name="title"
+            value={data.title}
             onChange={onChangeHandler}
             className="w-full p-2 border rounded"
-            type="text"
-            placeholder="Blog Title..."
             required
           />
         </div>
-        
-        {/* Career & Job Details */}
+
         <div className="flex space-x-4">
           <div>
             <p className="font-bold">Career</p>
@@ -85,7 +87,6 @@ const Page = () => {
               ))}
             </div>
           </div>
-          
           <div>
             <p className="font-bold">Job Details</p>
             <div className="flex flex-wrap gap-2">
@@ -102,8 +103,7 @@ const Page = () => {
             </div>
           </div>
         </div>
-        
-        {/* Upload Image */}
+
         <div>
           <p className="font-bold">Upload Image</p>
           <label htmlFor="image" className="block w-40 h-20 bg-gray-400 flex items-center justify-center cursor-pointer">
@@ -111,12 +111,12 @@ const Page = () => {
           </label>
           <input onChange={onImageChange} type="file" id="image" hidden />
         </div>
-        
-        {/* Related Company */}
+
         <div>
           <label className="font-bold">Related Company <span className="text-red-500">*</span></label>
           <select
             name="company"
+            value={data.company}
             onChange={onChangeHandler}
             className="w-full p-2 border rounded"
             required
@@ -126,34 +126,31 @@ const Page = () => {
             ))}
           </select>
         </div>
-        
-        {/* Source Link */}
+
         <div>
           <label className="font-bold">Source Link</label>
           <input
             name="sourceLink"
+            value={data.sourceLink}
             onChange={onChangeHandler}
             className="w-full p-2 border rounded"
             type="text"
-            placeholder="Source Link..."
           />
         </div>
-        
-        {/* Blog Details */}
+
         <div>
           <label className="font-bold">Details <span className="text-red-500">*</span></label>
           <textarea
             name="description"
+            value={data.description}
             onChange={onChangeHandler}
             className="w-full p-2 border rounded"
-            placeholder="Details..."
             required
           />
         </div>
-        
-        {/* Buttons */}
+
         <div className="flex space-x-4">
-          <button type="button" className="bg-red-600 text-white px-6 py-2 rounded">CANCEL</button>
+          <button type="button" onClick={handleDelete} className="bg-red-600 text-white px-6 py-2 rounded">DELETE</button>
           <button type="submit" className="bg-black text-white px-6 py-2 rounded">SUBMIT</button>
         </div>
       </form>
@@ -161,4 +158,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default EditBlogPage;
