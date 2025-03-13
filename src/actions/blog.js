@@ -2,16 +2,16 @@ import { blogPostRules } from "@/lib/arcjet";
 import { verifyAuth } from "@/lib/auth";
 import connectToDatabase from "@/lib/db";
 import BlogPost from "@/models/BlogPost";
-import { request, shield } from "@arcjet/next";
+import { request } from "@arcjet/next";
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { z } from "zod";
 
 const blogPostSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  content: z.string().min(1, "Content is required"),
-  category: z.string().min(1, "category is required"),
-  coverImage: z.string().min(1, "Image is required"),
+  title: z.string().min(1, "กรุณาระบุชื่อบทความ"),
+  content: z.string().min(1, "กรุณาระบุเนื้อหาบทความ"),
+  category: z.string().min(1, "กรุณาเลือกหมวดหมู่"),
+  coverImage: z.string().min(1, "กรุณาอัปโหลดรูปภาพหน้าปก"),
 });
 
 export async function createBlogPostAction(data) {
@@ -20,7 +20,7 @@ export async function createBlogPostAction(data) {
 
   if (!user) {
     return {
-      error: "Unauth user",
+      error: "คุณไม่ได้รับอนุญาตให้สร้างบทความ กรุณาเข้าสู่ระบบ",
       status: 401,
     };
   }
@@ -42,39 +42,32 @@ export async function createBlogPostAction(data) {
 
     const decision = await blogPostRules.protect(req, {
       shield: {
-        params: {
-          title,
-          content,
-          isSuspicious,
-        },
+        params: { title, content, isSuspicious },
       },
       requested: 10,
     });
 
-    console.log(decision);
-
     if (decision.isErrored()) {
       return {
-        error: "An error occured!",
+        error: "เกิดข้อผิดพลาดในการตรวจสอบข้อมูล โปรดลองอีกครั้ง",
       };
     }
 
     if (decision.isDenied()) {
       if (decision.reason.isShield()) {
         return {
-          error:
-            "Input validation failed! Potentially malicious content detected",
+          error: "ไม่สามารถสร้างบทความได้ ตรวจพบเนื้อหาที่อาจเป็นอันตราย",
         };
       }
 
       if (decision.reason.isBot()) {
         return {
-          error: "Bot activity detected",
+          error: "ไม่สามารถสร้างบทความได้ ระบบตรวจพบพฤติกรรมของบอท",
         };
       }
 
       return {
-        error: "Request denied",
+        error: "ไม่สามารถดำเนินการได้ คำขอถูกปฏิเสธ",
         status: 403,
       };
     }
@@ -92,13 +85,14 @@ export async function createBlogPostAction(data) {
 
     await post.save();
     revalidatePath("/");
+
     return {
       success: true,
       post,
     };
   } catch (e) {
     return {
-      error: e,
+      error: "เกิดข้อผิดพลาดในการบันทึกข้อมูล โปรดลองอีกครั้ง",
     };
   }
 }
@@ -109,7 +103,7 @@ export async function getBlogPostsAction() {
 
   if (!user) {
     return {
-      error: "Unauth user",
+      error: "คุณไม่ได้รับอนุญาตให้ดูบทความ กรุณาเข้าสู่ระบบ",
       status: 401,
     };
   }
@@ -117,32 +111,33 @@ export async function getBlogPostsAction() {
   try {
     const req = await request();
     const decision = await blogPostRules.protect(req, { requested: 10 });
+
     if (decision.isDenied()) {
       if (decision.reason.isRateLimit()) {
         return {
-          error: "Rate limit excedeed! Please try after some time",
-          statu: 429,
+          error: "มีการเรียกใช้งานบ่อยเกินไป กรุณาลองใหม่ภายหลัง",
+          status: 429,
         };
       }
 
       if (decision.reason.isBot()) {
         return {
-          error: "Bot activity detected",
+          error: "ไม่สามารถดึงข้อมูลบทความได้ ระบบตรวจพบพฤติกรรมของบอท",
         };
       }
+
       return {
-        error: "Request denied",
+        error: "ไม่สามารถดำเนินการได้ คำขอถูกปฏิเสธ",
         status: 403,
       };
     }
-
-    console.log(decision, "decision123");
 
     await connectToDatabase();
 
     const posts = await BlogPost.find({})
       .sort({ createdAt: -1 })
       .populate("author", "name");
+
     const serializedPosts = posts.map((post) => ({
       _id: post._id.toString(),
       title: post.title,
@@ -161,7 +156,7 @@ export async function getBlogPostsAction() {
     };
   } catch (e) {
     return {
-      error: "Failed to fetch the blogs! Please try again",
+      error: "เกิดข้อผิดพลาดในการดึงข้อมูลบทความ โปรดลองอีกครั้ง",
     };
   }
 }
@@ -172,7 +167,7 @@ export async function getBlogPostByIdAction(id) {
 
   if (!user) {
     return {
-      error: "Unauth user",
+      error: "คุณไม่ได้รับอนุญาตให้ดูบทความ กรุณาเข้าสู่ระบบ",
       status: 401,
     };
   }
@@ -180,34 +175,37 @@ export async function getBlogPostByIdAction(id) {
   try {
     const req = await request();
     const decision = await blogPostRules.protect(req, { requested: 5 });
+
     if (decision.isDenied()) {
       if (decision.reason.isRateLimit()) {
         return {
-          error: "Rate limit excedeed! Please try after some time",
-          statu: 429,
+          error: "มีการเรียกใช้งานบ่อยเกินไป กรุณาลองใหม่ภายหลัง",
+          status: 429,
         };
       }
 
       if (decision.reason.isBot()) {
         return {
-          error: "Bot activity detected",
+          error: "ไม่สามารถดึงข้อมูลบทความได้ ระบบตรวจพบพฤติกรรมของบอท",
         };
       }
+
       return {
-        error: "Request denied",
+        error: "ไม่สามารถดำเนินการได้ คำขอถูกปฏิเสธ",
         status: 403,
       };
     }
 
     await connectToDatabase();
     const post = await BlogPost.findOne({ _id: id }).populate("author", "name");
+
     return {
       success: true,
       post: JSON.stringify(post),
     };
   } catch (e) {
     return {
-      error: "Failed to fetch the blog detail! Please try again",
+      error: "เกิดข้อผิดพลาดในการดึงข้อมูลบทความ โปรดลองอีกครั้ง",
     };
   }
 }
