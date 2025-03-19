@@ -9,4 +9,5 @@ export const BLOG_CATEGORIES = [
   { key: "mobileDevelopment", value: "Mobile Development" },
   { key: "devOps", value: "DevOps" },
   { key: "blockchain", value: "Blockchain" },
+  { key: "company", value: "Company" }, // เพิ่มหมวดหมู่ใหม่
 ];

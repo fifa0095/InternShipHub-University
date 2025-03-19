@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircleIcon } from "lucide-react";
+import { MessageCircleIcon, Loader2, TagIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
@@ -16,7 +16,6 @@ const schema = z.object({
 });
 
 function BlogDetails({ post }) {
-  console.log(post, "post in blog details page");
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm({
     resolver: zodResolver(schema),
@@ -49,37 +48,53 @@ function BlogDetails({ post }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+      {/* Header */}
       <header className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">{post?.title}</h1>
+        <h1 className="text-4xl font-bold mb-2">{post?.title}</h1>
+
+        {/* Category */}
+        {post?.category && (
+          <div className="flex items-center space-x-2 mb-4">
+            <TagIcon className="h-5 w-5 text-blue-500" />
+            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+              {post.category}
+            </span>
+          </div>
+        )}
+
         <div className="flex items-center space-x-4">
           <Avatar className="h-12 w-12">
             <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>{post?.author?.name || ""}</AvatarFallback>
+            <AvatarFallback>{post?.author?.name?.charAt(0) || "U"}</AvatarFallback>
           </Avatar>
           <div>
             <p className="text-xl font-medium">{post?.author?.name}</p>
           </div>
-          <div className="flex justify-between items-center my-8">
-            <div className="flex space-x-4">
-              <Button variant="ghost" size="sm">
-                <MessageCircleIcon className="h-8 w-8" />
-                {post?.comments?.length}
-              </Button>
-            </div>
+          <div className="flex items-center my-8">
+            <Button variant="ghost" size="sm">
+              <MessageCircleIcon className="h-6 w-6" />
+              <span className="ml-2">{post?.comments?.length || 0}</span>
+            </Button>
           </div>
         </div>
       </header>
+
+      {/* Cover Image */}
       {post?.coverImage && (
         <img
           src={post?.coverImage}
-          className="w-full h-96 object-cover rounded-lg mb-8"
+          className="w-full h-full object-cover rounded-lg mb-8"
+          alt="Cover Image"
         />
       )}
+
+      {/* Blog Content */}
       <article className="prose lg:prose-xl">
         <div dangerouslySetInnerHTML={{ __html: post?.content }} />
       </article>
-      {/* comment form */}
-      <form onSubmit={handleSubmit(onCommentSubmit)}>
+
+      {/* Comment Form */}
+      <form onSubmit={handleSubmit(onCommentSubmit)} className="mt-10">
         <Textarea
           placeholder="Add a comment..."
           className="w-full mb-4"
@@ -87,26 +102,40 @@ function BlogDetails({ post }) {
           {...register("content")}
         />
         <Button type="submit" disabled={isLoading}>
-          Submit Comment
+          {isLoading ? (
+            <>
+              <Loader2 className="animate-spin h-5 w-5 mr-2" />
+              Submitting...
+            </>
+          ) : (
+            "Submit Comment"
+          )}
         </Button>
       </form>
+
+      {/* Comment List */}
       <div className="my-8">
         <h3 className="text-xl font-bold mb-4">
-          Comments {post?.comments?.length}
+          Comments ({post?.comments?.length || 0})
         </h3>
-        {post?.comments?.map((comment, index) => (
-          <div key={index} className="border-b py-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <Avatar>
-                <AvatarFallback>
-                  {comment?.authorName?.[0] || "CN"}
-                </AvatarFallback>
-              </Avatar>
-              <p className="font-medium">{comment.authorName || "Sangam"}</p>
+
+        {post?.comments?.length > 0 ? (
+          post?.comments?.map((comment, index) => (
+            <div key={index} className="border-b py-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <Avatar>
+                  <AvatarFallback>
+                    {comment?.authorName?.charAt(0) || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <p className="font-medium">{comment.authorName || "Anonymous"}</p>
+              </div>
+              <p className="text-gray-800">{comment.content}</p>
             </div>
-            <p>{comment.content}</p>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className="text-gray-500">No comments yet. Be the first to comment!</p>
+        )}
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import CommonLayout from "@/components/Layout/layout";
 import { Toaster } from "@/components/ui/toaster";
+import Sidebar from "@/components/ClientSidebar/Sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,7 +25,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CommonLayout>{children}</CommonLayout>
+        {/* Sidebar ติดซ้าย */}
+        <Sidebar />
+        
+        {/* Main Content */}
+        <div className="pl-64">
+          <CommonLayout>{children}</CommonLayout>
+        </div>
+        
         <Toaster />
       </body>
     </html>

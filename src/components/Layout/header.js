@@ -22,12 +22,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { searchPostsAction } from "@/actions/blogInteractions";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "../ui/sheet";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
+import Sidebar from "../ClientSidebar/Sidebar";
 
 const searchSchema = z.object({
   query: z.string().min(1, "Query is required"),
@@ -121,7 +121,6 @@ export default function Header({ user }) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {/* Allow all users to have Premium */}
                   <DropdownMenuItem>
                     <span>Premium User</span>
                   </DropdownMenuItem>
@@ -194,6 +193,7 @@ export default function Header({ user }) {
           </div>
         </SheetContent>
       </Sheet>
+      {/* <Sidebar /> */}
     </header>
   );
 }
