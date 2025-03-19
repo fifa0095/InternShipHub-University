@@ -29,6 +29,7 @@ import {
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import Sidebar from "../ClientSidebar/Sidebar";
 
+// Search schema
 const searchSchema = z.object({
   query: z.string().min(1, "Query is required"),
 });
@@ -38,9 +39,11 @@ export default function Header({ user }) {
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false); // New state for edit profile modal
   const { toast } = useToast();
 
-  const { register, handleSubmit, reset } = useForm({
+  // Form setup for search and profile edit
+  const { register, handleSubmit, reset, setValue } = useForm({
     resolver: zodResolver(searchSchema),
   });
 
@@ -74,6 +77,26 @@ export default function Header({ user }) {
       console.error(result.error);
     }
   }
+
+  // Handle form submission to update profile
+  const handleEditProfileSubmit = async (data) => {
+    try {
+      // Call API to update the user's profile information (data contains new values)
+      console.log(data); // You can send this data to an API to update user profile
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated.",
+        variant: "success",
+      });
+      setIsEditProfileOpen(false); // Close the edit profile modal
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: e.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white z-50">
@@ -124,6 +147,10 @@ export default function Header({ user }) {
                   <DropdownMenuItem>
                     <span>Premium User</span>
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsEditProfileOpen(true)}>
+                    <Edit className="h-4 w-4" />
+                    <span>Edit Profile</span>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="h-4 w-4" />
                     <span>Log Out</span>
@@ -134,6 +161,40 @@ export default function Header({ user }) {
           </div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
+        <DialogContent>
+          <DialogTitle>Edit Your Profile</DialogTitle>
+          <form onSubmit={handleSubmit(handleEditProfileSubmit)}>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="name">Name</label>
+                <Input
+                  id="name"
+                  {...register("name")}
+                  placeholder="Enter your name"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <label htmlFor="email">Email</label>
+                <Input
+                  id="email"
+                  {...register("email")}
+                  placeholder="Enter your email"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <Button type="submit">Save Changes</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Search Results Sheet */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent
           side="right"
@@ -188,12 +249,11 @@ export default function Header({ user }) {
                 </article>
               ))
             ) : (
-              <h3>No blogs found</h3>
+              <p>No results found</p>
             )}
           </div>
         </SheetContent>
       </Sheet>
-      {/* <Sidebar /> */}
     </header>
   );
 }
