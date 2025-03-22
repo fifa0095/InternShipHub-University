@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
-
+// Resumes Schema
+const ResumeSchema = new mongoose.Schema({
+  upload_at: { type: Date, default: Date.now },
+  educational: { type: String, required: true },
+  skill: { type: String, required: true },
+  experience: { type: String, required: true }
+});
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -24,6 +30,7 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  resume: [ResumeSchema],
 });
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);
