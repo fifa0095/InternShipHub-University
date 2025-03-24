@@ -2,6 +2,14 @@ const Blog = require('../models/Blog');
 
 exports.createBlog = async (req, res) => {
     try {
+
+        const existingBlog = await Blog.findOne({ title: req.body.title });
+
+        if (existingBlog) {
+            return res.status(400).json({ error: 'Blog with this title already exists' });
+        }
+
+        
         const user = new Blog(req.body);
         await user.save();
         res.status(201).json(user);

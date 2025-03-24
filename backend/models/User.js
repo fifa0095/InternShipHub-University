@@ -6,6 +6,7 @@ const ResumeSchema = new mongoose.Schema({
   skill: { type: String, required: true },
   experience: { type: String, required: true }
 });
+
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
