@@ -1,105 +1,83 @@
-import { connectToDatabase } from "@/lib/db";
-import User from "@/models/User"; // สมมติว่าใช้ UserModel ในการเก็บข้อมูล
+import connectToDatabase from "@/lib/db"; 
+import User from "@/models/User";
+import { verifyAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { cookies } from "next/headers";
+import { z } from "zod";
 
-const LoadDB = async () => {
-  await connectToDatabase();
-};
+const resumeSchema = z.object({
+  educational: z.string().min(1, "กรุณาระบุข้อมูลการศึกษา"),
+  skill: z.string().min(1, "กรุณาระบุทักษะความสามารถ"),
+  experience: z.string().min(1, "กรุณาระบุประสบการณ์ทำงาน"),
+});
 
-LoadDB();
-
-// API สำหรับการดึงข้อมูล Resume
-export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    if (userId) {
-      const user = await User.findById(userId);
-      if (!user) {
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-      }
-      return NextResponse.json(user.resume); // ดึงข้อมูล Resume ของ User
-    }
-
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
-  } catch (error) {
-    console.error("Error fetching resume:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
-}
-
-// API สำหรับการอัปโหลด Resume
 export async function POST(request) {
   try {
-    const formData = await request.formData();
-    const timestamp = Date.now();
+    const token = cookies().get("token")?.value;
+    const user = await verifyAuth(token);
 
-    // ตรวจสอบการมีอยู่ของไฟล์ Resume
-    const resumeFile = formData.get("resume");
-    if (!resumeFile) {
-      return NextResponse.json(
-        { error: "No resume file found in the request" },
-        { status: 400 }
-      );
+    if (!user) {
+      return NextResponse.json({ 
+        error: "คุณไม่ได้รับอนุญาตให้อัปโหลด Resume กรุณาเข้าสู่ระบบ" 
+      }, { status: 401 });
     }
 
-    // ตรวจสอบข้อมูลที่จำเป็นสำหรับ Resume
+    const formData = await request.formData();
+
+    // ตรวจสอบข้อมูลที่ได้จาก formData
     const educational = formData.get("educational");
     const skill = formData.get("skill");
     const experience = formData.get("experience");
-    const userId = formData.get("userId");
 
-    if (!educational || !skill || !experience || !userId) {
-      return NextResponse.json(
-        { error: "Required fields are missing" },
-        { status: 400 }
-      );
-    }
+    console.log("Received Data:", { educational, skill, experience }); // เพิ่มบรรทัดนี้เพื่อตรวจสอบ
 
-    // จัดการไฟล์ Resume
-    const resumeFileName = resumeFile.name || `resume_${timestamp}`;
-    const resumeFileByteData = await resumeFile.arrayBuffer();
-    const buffer = Buffer.from(resumeFileByteData);
-
-    const publicDir = path.join(process.cwd(), "public/uploads");
-    const filePath = `${publicDir}/${timestamp}_${resumeFileName}`;
-
-    // ตรวจสอบให้แน่ใจว่า directory มีอยู่
-    await mkdir(publicDir, { recursive: true });
-
-    await writeFile(filePath, buffer);
-
-    const resumeFileUrl = `/uploads/${timestamp}_${resumeFileName}`;
-
-    // เตรียมข้อมูล Resume
-    const resumeData = {
+    // ตรวจสอบความถูกต้องของข้อมูล
+    const validateFields = resumeSchema.safeParse({
       educational,
       skill,
-      experience,
-      file: resumeFileUrl, // URL ของไฟล์ Resume
-    };
+      experience
+    });
 
-    // ค้นหาผู้ใช้ในฐานข้อมูลและอัปเดต Resume
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!validateFields.success) {
+      return NextResponse.json({
+        error: validateFields.error.errors[0].message
+      }, { status: 400 });
     }
 
-    // เพิ่ม Resume ใหม่เข้าไปในข้อมูลของผู้ใช้
-    user.resume.push(resumeData);
-    await user.save();
+    try {
+      await connectToDatabase();
+      console.log("Connected to MongoDB");
 
-    return NextResponse.json(
-      { success: true, msg: "Resume uploaded successfully" },
-      { status: 201 }
-    );
+      // ค้นหาผู้ใช้ในฐานข้อมูลและอัปเดต Resume
+      const userData = await User.findById(user.userId);
+      if (!userData) {
+        return NextResponse.json({ error: "ไม่พบข้อมูลผู้ใช้" }, { status: 404 });
+      }
+
+      // เพิ่ม Resume ใหม่เข้าไปในข้อมูลของผู้ใช้
+      userData.resume.push({
+        upload_at: new Date(),
+        educational: validateFields.data.educational,
+        skill: validateFields.data.skill,
+        experience: validateFields.data.experience
+      });
+      await userData.save();
+
+      return NextResponse.json(
+        { success: true, msg: "อัปโหลด Resume สำเร็จ" },
+        { status: 201 }
+      );
+    } catch (error) {
+      console.error("Error during database operation:", error);
+      return NextResponse.json(
+        { error: "เกิดข้อผิดพลาดในการประมวลผลคำขอ โปรดลองอีกครั้ง" },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error("Error in POST API:", error);
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์", details: error.message },
       { status: 500 }
     );
   }
