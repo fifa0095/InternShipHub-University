@@ -21,7 +21,7 @@ const CompaniesPage = () => {
       const fetchedBlogs = response?.data?.blogs || [];
 
       const companyBlogs = fetchedBlogs.filter(
-        (blog) => blog.category === "Company" && blog.image && "Developer"
+        (blog) => blog.category === "Company" 
       );
 
       setBlogs(companyBlogs);

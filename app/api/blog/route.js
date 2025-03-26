@@ -1,117 +1,101 @@
-import { ConnectDB } from "@/lib/config/db";
-import BlogModel from "@/lib/models/BlogModels";
-import { NextResponse } from "next/server"; // แก้ไขการนำเข้า
+import { connectToDatabase } from "@/lib/db";
+import User from "@/models/User"; // Use User model for database interactions
+import { NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
+// Load database connection
 const LoadDB = async () => {
-  await ConnectDB();
+  await connectToDatabase();
 };
 
-LoadDB();
-
+// API for fetching resume data
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const blogId = searchParams.get("id");
+    const userId = searchParams.get("userId");
 
-    if (blogId) {
-      const blog = await BlogModel.findById(blogId);
-      if (!blog) {
-        return NextResponse.json({ error: "Blog not found" }, { status: 404 });
-      }
-      return NextResponse.json(blog);
+    if (!userId) {
+      return NextResponse.json({ error: "User ID is required" }, { status: 400 });
     }
 
-    const blogs = await BlogModel.find({});
-    return NextResponse.json({ blogs });
+    // Connect to DB and fetch user
+    await LoadDB();
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(user.resume); // Return resume data
   } catch (error) {
-    console.error("Error fetching blogs:", error);
+    console.error("Error fetching resume:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
-
-// api enpoint for uploading blog
+// API for uploading resume data
 export async function POST(request) {
   try {
     const formData = await request.formData();
     const timestamp = Date.now();
 
-    // Validate image existence
-    const image = formData.get("image");
-    if (!image) {
-      return NextResponse.json(
-        { error: "No image file found in the request" },
-        { status: 400 }
-      );
+    // Ensure the resume file is present
+    const resumeFile = formData.get("resume");
+    if (!resumeFile) {
+      return NextResponse.json({ error: "No resume file found in the request" }, { status: 400 });
     }
 
-    // Validate other required form data fields
-    const title = formData.get("title");
-    const description = formData.get("description");
-    const category = formData.get("category");
-    const author = formData.get("author");
-    const authorImg = formData.get("authorImg");
+    // Ensure required fields are present
+    const educational = formData.get("educational");
+    const skill = formData.get("skill");
+    const experience = formData.get("experience");
+    const userId = formData.get("userId");
 
-    if (!title || !description || !category || !author) {
-      return NextResponse.json(
-        { error: "Required fields are missing" },
-        { status: 400 }
-      );
+    if (!educational || !skill || !experience || !userId) {
+      return NextResponse.json({ error: "Required fields are missing" }, { status: 400 });
     }
 
-    // Handle the image file
-    const imageName = image.name || `image_${timestamp}`;
-    const imageByteData = await image.arrayBuffer();
-    const buffer = Buffer.from(imageByteData);
+    // Handle the resume file (save it)
+    const resumeFileName = resumeFile.name || `resume_${timestamp}`;
+    const resumeFileByteData = await resumeFile.arrayBuffer();
+    const buffer = Buffer.from(resumeFileByteData);
 
     const publicDir = path.join(process.cwd(), "public/uploads");
-    const filePath = `${publicDir}/${timestamp}_${imageName}`;
+    const filePath = `${publicDir}/${timestamp}_${resumeFileName}`;
 
-    // Ensure directory exists
+    // Ensure the upload directory exists
     await mkdir(publicDir, { recursive: true });
 
     await writeFile(filePath, buffer);
 
-    const imgUrl = `/uploads/${timestamp}_${imageName}`;
+    const resumeFileUrl = `/uploads/${timestamp}_${resumeFileName}`;
 
-    // Handle authorImg if it's a file
-    let authorImgUrl = "";
-    if (authorImg && authorImg.size > 0) {
-      const authorImgName = `authorImg_${timestamp}_${authorImg.name}`;
-      const authorImgByteData = await authorImg.arrayBuffer();
-      const authorImgBuffer = Buffer.from(authorImgByteData);
-
-      const authorImgPath = path.join(publicDir, authorImgName);
-      await writeFile(authorImgPath, authorImgBuffer);
-
-      authorImgUrl = `/uploads/${authorImgName}`;
-    }
-
-    // Prepare blog data
-    const blogData = {
-      title: title,
-      description: description,
-      category: category,
-      author: author,
-      image: imgUrl,
-      authorImg: authorImgUrl, // Use URL for authorImg
+    // Prepare the resume data
+    const resumeData = {
+      educational,
+      skill,
+      experience,
+      file: resumeFileUrl,
     };
 
-    // Save blog to the database
-    await BlogModel.create(blogData);
-    console.log("Blog Saved");
+    // Connect to DB and find the user
+    await LoadDB();
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Add resume to user data and save
+    user.resume.push(resumeData);
+    await user.save();
 
     return NextResponse.json(
-      { success: true, msg: "Blog added successfully" },
+      { success: true, msg: "Resume uploaded successfully" },
       { status: 201 }
     );
   } catch (error) {
     console.error("Error in POST API:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
   }
 }
