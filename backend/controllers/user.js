@@ -88,7 +88,10 @@ exports.login = async (req, res) => {
             .setExpirationTime("2h")
             .sign(crypto.createSecretKey(Buffer.from(process.env.JWT_SECRET), 'utf-8'));  // Using the built-in crypto module for the secret key
 
-        return res.status(200).send(userToken);
+        return res.status(200).json({
+            success: "Logged in successfully",
+            token: userToken,
+        });
 
     } catch (e) {
         console.error("Login error:", e);
