@@ -61,15 +61,15 @@ export default function CompanyBlogsComponent({ posts }) {
                     } relative`}
                   >
                     <img
-                      src={postItem?.coverImage}
+                      src={postItem?.banner_link}
                       alt={postItem?.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
 
                   <div className={`flex-1 p-4 ${isGridView ? "" : "w-2/3"}`}>
-                    {/* Category Badge */}
-                    {postItem.category && (
+                    {/* tags Badge */}
+                    {postItem.tags && (
                       <div className="flex items-center space-x-2 mb-2">
                         <BuildingIcon className="h-5 w-5 text-blue-500" />
                         <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">

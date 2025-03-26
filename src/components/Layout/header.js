@@ -108,10 +108,10 @@ export default function Header({ user }) {
                 onClick={() => router.push("/")}
                 className="text-2xl cursor-pointer font-bold font-serif tracking-tighter"
               >
+                <span className="ml-1">Internship</span>
                 <span className="bg-black text-white px-2 py-1 rounded-full">
-                  M
+                  Huf
                 </span>
-                <span className="ml-1">Medium</span>
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -218,7 +218,7 @@ export default function Header({ user }) {
                 >
                   <div className={`w-1/3 h-full relative`}>
                     <img
-                      src={searchResultItem?.coverImage}
+                      src={searchResultItem?.banner_link}
                       alt={searchResultItem?.title}
                       className="w-full h-full object-cover"
                     />

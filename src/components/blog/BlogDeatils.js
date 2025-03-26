@@ -53,14 +53,31 @@ function BlogDetails({ post }) {
         <h1 className="text-4xl font-bold mb-2">{post?.title}</h1>
 
         {/* Category */}
-        {post?.category && (
-          <div className="flex items-center space-x-2 mb-4">
-            <TagIcon className="h-5 w-5 text-blue-500" />
-            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-              {post.category}
+        {post?.tags && (
+  <div className="flex items-center space-x-2 mb-4 flex-wrap">
+    <TagIcon className="h-5 w-5 text-blue-500" />
+    <div className="flex flex-wrap gap-2">
+      {Array.isArray(post.tags)
+        ? post.tags.map((tag, index) => (
+            <span
+              key={index}
+              className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+            >
+              {tag}
             </span>
-          </div>
-        )}
+          ))
+        : post.tags.split(",").map((tag, index) => (
+            <span
+              key={index}
+              className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+            >
+              {tag.trim()}
+            </span>
+          ))}
+    </div>
+  </div>
+)}
+
 
         <div className="flex items-center space-x-4">
           <Avatar className="h-12 w-12">
@@ -80,9 +97,9 @@ function BlogDetails({ post }) {
       </header>
 
       {/* Cover Image */}
-      {post?.coverImage && (
+      {post?.banner_link && (
         <img
-          src={post?.coverImage}
+          src={post?.banner_link}
           className="w-full h-full object-cover rounded-lg mb-8"
           alt="Cover Image"
         />

@@ -1,6 +1,6 @@
 // src/app/companies/page.js
 import { getBlogPostsAction } from "@/actions/blog"; // ฟังก์ชันดึงข้อมูล Blog ทั้งหมด
-import CompanyBlogsComponent from "@/components/home/CompanyBlogs";
+import CompanyBlogsComponent from "@/components/BlogCompany/CompanyBlogs";
 import { notFound } from "next/navigation";
 
 export default async function CompaniesPage() {
@@ -12,9 +12,9 @@ export default async function CompaniesPage() {
 
   // กรองเฉพาะบล็อกที่มีหมวดหมู่ 'company'
   const companyBlogs = data.posts.filter((post) =>
-    Array.isArray(post.category)
-      ? post.category.includes("company") // รองรับ Array
-      : post.category === "company"
+    Array.isArray(post.tags)
+      ? post.tags.includes("company") // รองรับ Array
+      : post.tags === "company"
   );
 
   return <CompanyBlogsComponent posts={companyBlogs} />;

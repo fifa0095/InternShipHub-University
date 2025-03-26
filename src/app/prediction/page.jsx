@@ -53,7 +53,7 @@ const Page = () => {
     <form onSubmit={handleSubmit} className="pt-5 px-5 sm:pt-12 sm:pl-16 mt-10">
       <div className="text-center">
         <h1 className="text-2xl sm:text-5xl font-semibold max-w-[700px] mx-auto">
-          Upload your resume
+          Input your skill
         </h1>
       </div>
 
@@ -86,8 +86,8 @@ const Page = () => {
         required
       />
 
-      <button type="submit" className="bg-black text-white w-40 mt-8 h-12">
-        Submit Resume
+      <button type="submit" className="bg-black text-white w-40 mt-12 h-12">
+        Submit
       </button>
     </form>
   );

@@ -16,7 +16,7 @@ import "react-quill-new/dist/quill.snow.css";
 import "./quill-custom.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BLOG_CATEGORIES } from "@/lib/config";
+import { BLOG_CATEGORIES, COMPANY_LIST } from "@/lib/config";
 
 // Schema สำหรับ Form Validation
 const blogPostSchema = z.object({
@@ -144,16 +144,34 @@ function CreateBlogForm({ user }) {
             )}
           />
           {errors.title && <p className="text-sm text-red-600 mt-2">{errors.title.message}</p>}
-
+ 
           {/* เพิ่ม Input สำหรับ Company Name */}
           <Controller
-            name="company_name"
-            control={control}
-            render={({ field }) => (
-              <Input {...field} type="text" placeholder="Company Name (Optional)" className="text-xl font-normal border-none outline-none mb-4 p-0 focus-visible:ring-0" />
-            )}
-          />
-          {errors.company_name && <p className="text-sm text-red-600 mt-2">{errors.company_name.message}</p>}
+  name="company_name"
+  control={control}
+  render={({ field }) => {
+    const selectedCompany = COMPANY_LIST.find((company) => company.key === field.value);
+    return (
+      <div>
+        <Select
+          options={COMPANY_LIST.map((company) => ({
+            value: company.key,
+            label: company.value,
+          }))}
+          className="mb-4"
+          value={selectedCompany ? { value: selectedCompany.key, label: selectedCompany.value } : null}
+          onChange={(selectedOption) => field.onChange(selectedOption ? selectedOption.value : "")}
+          placeholder="Select a Company..."
+          isClearable
+        />
+        {/* {selectedCompany && (
+          <p className="text-sm text-gray-700 mt-2">Selected: {selectedCompany.value}</p>
+        )} */}
+      </div>
+    );
+  }}
+/>
+{errors.company_name && <p className="text-sm text-red-600 mt-2">{errors.company_name.message}</p>}
 
           {/* ใช้ react-select เพื่อเลือกหลาย tags */}
           <Controller
