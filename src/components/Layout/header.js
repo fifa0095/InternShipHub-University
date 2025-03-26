@@ -137,16 +137,16 @@ export default function Header({ user }) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Avatar className="h-8 w-8 cursor-pointer">
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarImage src="https://i.pinimg.com/736x/43/0c/53/430c53ef3a97464b81b24b356ed39d32.jpg" />
+                    <AvatarFallback>Unknown</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  {/* <DropdownMenuItem>
                     <span>Premium User</span>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuItem onClick={() => setIsEditProfileOpen(true)}>
                     <Edit className="h-4 w-4" />
                     <span>Edit Profile</span>
@@ -226,7 +226,7 @@ export default function Header({ user }) {
                   <div className={`flex-1 p-4 w-2/3`}>
                     <div className="flex items-center space-x-2 mb-2">
                       <Avatar className="h-6 w-6">
-                        <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarImage src="https://i.pinimg.com/736x/43/0c/53/430c53ef3a97464b81b24b356ed39d32.jpg" />
                         <AvatarFallback>
                           {searchResultItem?.author?.name[0] || ""}
                         </AvatarFallback>
