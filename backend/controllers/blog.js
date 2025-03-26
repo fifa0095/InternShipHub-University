@@ -10,9 +10,9 @@ exports.createBlog = async (req, res) => {
         }
 
         
-        const user = new Blog(req.body);
-        await user.save();
-        res.status(201).json(user);
+        const blog = new Blog(req.body);
+        await blog.save();
+        res.status(201).json(blog);
     } catch (error) {
         console.error("Error Saving Blog:", error.message);
         res.status(400).json({ error: error.message });

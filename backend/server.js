@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/db');
 const cors = require('cors');
+const { readdirSync } = require('fs')
 
 
 
@@ -14,7 +15,7 @@ app.use(cors())
 
 connectDB();
 
-app.use('/api', require('./routes/blog'));
+readdirSync('./routes').map((r) => app.use('/api', require('./routes/' + r)))
 
 
 
