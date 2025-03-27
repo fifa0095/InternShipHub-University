@@ -4,9 +4,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
+  // ตรวจสอบคุกกี้ 'token' จากฝั่งเซิร์ฟเวอร์
   const token = (await cookies()).get("token")?.value;
 
+  console.log("Token from cookies:", token); // แสดงคุกกี้ในคอนโซลเพื่อตรวจสอบ
+  
   if (token) {
+    // ถ้ามี 'token' ให้รีไดเรกต์ไปยังหน้าโฮมเพจ
     redirect("/");
   }
 
@@ -34,7 +38,7 @@ export default async function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="hidden  md:flex w-1/2 p-12 items-center justify-center relative">
+      <div className="hidden md:flex w-1/2 p-12 items-center justify-center relative">
         <div className="max-w-lg space-y-6 text-white z-10">
           <h2 className="text-4xl text-black font-medium">
             Join us to explore the best blog experience
