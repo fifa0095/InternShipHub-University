@@ -8,13 +8,12 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { loginUserAction } from "@/actions/login";
 
 const schema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z
     .string()
-    .min(6, { message: "Password must be at least 6 chracters long." }),
+    .min(6, { message: "Password must be at least 6 characters long." }),
 });
 
 function LoginForm() {
@@ -32,30 +31,39 @@ function LoginForm() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      Object.keys(data).forEach((key) => formData.append(key, data[key]));
-      const result = await loginUserAction(formData);
+      const result = await fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data), // ส่งข้อมูลในรูปแบบ JSON
+        credentials: "same-origin", // ส่งคุกกี้ที่อยู่ในโดเมนเดียวกันไปกับคำขอ
+      }).then((res) => res.json());
+  
       if (result.success) {
+        // บันทึก Token ลงในคุกกี้
+        document.cookie = `token=${result.token}; path=/; max-age=3600; secure; SameSite=Strict`;
+  
         toast({
-          title: "Login successfull",
+          title: "Login successful",
           description: result.success,
         });
-        router.push("/");
+        router.push("/"); // เปลี่ยนหน้าไปที่โฮมเพจหลังจากล็อกอินสำเร็จ
       } else {
-        throw new Error(result.error || "Something wrong occured");
+        throw new Error(result.error || "Something went wrong");
       }
     } catch (e) {
-      console.log(e);
+      console.log(e); // แสดงข้อผิดพลาดในคอนโซล
       toast({
         title: "Login failed",
         description: e.message,
-        variant: "destructive",
+        variant: "destructive", // แจ้งข้อผิดพลาดด้วยโทนที่แตกต่าง
       });
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-4">
