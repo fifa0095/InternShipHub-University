@@ -6,7 +6,7 @@ const BlogSchema = new mongoose.Schema({
     company_name: { type: String, required: true },
     content: { type: Array, required: true },
     type: { type: String, required: true },
-    tag: { type: Object, required: true },
+    tags: { type: Object, required: true },
     src_from: { type: String, required: true },
     banner_link: { type: String, required: false }, // Added banner_link field
 }, { 
