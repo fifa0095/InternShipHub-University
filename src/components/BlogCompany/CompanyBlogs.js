@@ -83,11 +83,11 @@ export default function CompanyBlogsComponent({ posts }) {
                       <Avatar className="h-6 w-6">
                         <AvatarImage src="https://github.com/shadcn.png" />
                         <AvatarFallback>
-                          {postItem?.author?.name[0] || ""}
+                          {postItem?.author}
                         </AvatarFallback>
                       </Avatar>
                       <span className="text-[16px] font-medium text-gray-700">
-                        {postItem?.author?.name}
+                        {postItem?.author}
                       </span>
                     </div>
 
@@ -131,7 +131,7 @@ export default function CompanyBlogsComponent({ posts }) {
                       <Avatar className="h-12 w-12">
                         <AvatarImage src="https://github.com/shadcn.png" />
                         <AvatarFallback>
-                          {postItem?.author?.name[0] || ""}
+                          {postItem?.author}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 space-y-1">
@@ -140,7 +140,7 @@ export default function CompanyBlogsComponent({ posts }) {
                         </h4>
                         <div className="flex items-start space-x-2 text-xs text-gray-500">
                           <span className="text-[16px] font-bold">
-                            {postItem?.author?.name}
+                            {postItem?.author}
                           </span>
                           <span className="text-[12px] font-medium text-black ml-1">
                             {new Date(postItem?.createdAt).toLocaleDateString()}

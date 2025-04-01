@@ -9,22 +9,19 @@ const CommentSchema = new mongoose.Schema({
 });
 
 // Main Blog Schema (Merged)
-const BlogSchema = new mongoose.Schema(
-  {
-    author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // ใช้ ObjectId อ้างอิง User
-    title: { type: String, required: true },
-    company_name: { type: String, required: false }, // ชื่อบริษัท (Optional)
-    content: { type: Array, required: true }, // Array รองรับ Rich Text / Markdown
-    tags: { type: [String], required: false }, // ใช้ Array แทน category
-    src_from: { type: String, required: false }, // แหล่งที่มา (Optional)
-    banner_link: { type: String, required: false }, // ลิงก์รูปแบนเนอร์ (Optional)
-    comments: [CommentSchema], // ระบบคอมเมนต์
-    upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // ระบบ upvote
-  },
-  {
-    timestamps: true, // เพิ่ม createdAt & updatedAt อัตโนมัติ
-  }
-);
+const BlogSchema = new mongoose.Schema({
+  author: { type: String, required: true },
+  title: { type: String, required: true },
+  company_name: { type: String, required: true },
+  content: { type: Array, required: true },
+  type: { type: String, required: true },
+  tag: { type: Object, required: true },
+  src_from: { type: String, required: true },
+  banner_link: { type: String, required: false }, // Added banner_link field
+}, { 
+  timestamps: true 
+  
+}); // Automatically adds createdAt & updatedAt
 
 // Index for search optimization
 BlogSchema.index({ title: "text", tags: "text", company_name: "text" });

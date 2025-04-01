@@ -53,39 +53,32 @@ function BlogDetails({ post }) {
         <h1 className="text-4xl font-bold mb-2">{post?.title}</h1>
 
         {/* Category */}
-        {post?.tags && (
-  <div className="flex items-center space-x-2 mb-4 flex-wrap">
-    <TagIcon className="h-5 w-5 text-blue-500" />
-    <div className="flex flex-wrap gap-2">
-      {Array.isArray(post.tags)
-        ? post.tags.map((tag, index) => (
-            <span
-              key={index}
-              className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
-            >
-              {tag}
-            </span>
-          ))
-        : post.tags.split(",").map((tag, index) => (
-            <span
-              key={index}
-              className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
-            >
-              {tag.trim()}
-            </span>
-          ))}
-    </div>
-  </div>
-)}
-
+        {post?.tag && post.tag.length > 0 && (
+          <div className="flex items-center space-x-2 mb-4 flex-wrap">
+            <TagIcon className="h-5 w-5 text-blue-500" />
+            <div className="flex flex-wrap gap-2">
+              {post.tag.map((tag, index) => (
+                <span
+                  key={index}
+                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center space-x-4">
           <Avatar className="h-12 w-12">
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>{post?.author?.name?.charAt(0) || "U"}</AvatarFallback>
+            <AvatarImage src="https://i.pinimg.com/736x/43/0c/53/430c53ef3a97464b81b24b356ed39d32.jpg" />
+            <AvatarFallback>{post?.author?.charAt(0) || "U"}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-xl font-medium">{post?.author?.name}</p>
+            <p className="text-xl font-medium">{post?.author}</p>
+            {post?.company_name && (
+              <p className="text-gray-500 text-sm">{post.company_name}</p>
+            )}
           </div>
           <div className="flex items-center my-8">
             <Button variant="ghost" size="sm">
@@ -100,15 +93,35 @@ function BlogDetails({ post }) {
       {post?.banner_link && (
         <img
           src={post?.banner_link}
-          className="w-full h-full object-cover rounded-lg mb-8"
+          className="w-full max-w-[800px] max-h-[400px] object-cover rounded-lg mb-8 mx-auto"
           alt="Cover Image"
         />
       )}
 
       {/* Blog Content */}
-      <article className="prose lg:prose-xl">
-        <div dangerouslySetInnerHTML={{ __html: post?.content }} />
+      <article className="prose lg:prose-xl whitespace-pre-line mb-8">
+        {post?.content && Array.isArray(post.content)
+          ? post.content.map((section, index) => (
+              <p key={index} className="mb-4">
+                {Array.isArray(section) ? section.join("\n") : section}
+              </p>
+            ))
+          : "No content available"}
       </article>
+
+      {/* Source Link */}
+      {post?.src_from && (
+        <div className="text-center my-4">
+          <a
+            href={post.src_from}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline"
+          >
+            Read the original post here
+          </a>
+        </div>
+      )}
 
       {/* Comment Form */}
       <form onSubmit={handleSubmit(onCommentSubmit)} className="mt-10">
