@@ -75,6 +75,16 @@ const Sidebar = () => {
             <Image src={assets.email_icon} width={24} height={24} alt="Company" />
             <span className="ml-3">Explore Company</span>
           </Link>
+
+          <Link
+            href="/DataVirtual"
+            className={`flex items-center px-5 py-3 rounded-r-full transition ${
+              pathname === "/DataVirtual" ? "bg-black text-white" : "hover:bg-gray-100"
+            }`}
+          >
+            <Image src={assets.email_icon} width={24} height={24} alt="DataVirtual" />
+            <span className="ml-3">Data Vitaul</span>
+          </Link>
         </nav>
       </div>
     </div>
