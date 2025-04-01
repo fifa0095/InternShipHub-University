@@ -76,14 +76,14 @@ function CreateBlogForm({ user }) {
   
     setIsLoading(true);
     try {
-      const result = await fetch("/api/create-blog-post", {
+      const result = await fetch("http://localhost:8080/api/createBlog", { // Updated URL
         method: "POST",
         headers: {
           "Content-type": "application/json",
         },
         body: JSON.stringify({
           ...data,
-          content: Array.isArray(data.content) ? data.content : [data.content], // ตรวจสอบให้แน่ใจว่าเป็น array
+          content: Array.isArray(data.content) ? data.content : [data.content], // Ensure content is an array
         }),
       }).then((res) => res.json());
   
@@ -115,13 +115,14 @@ function CreateBlogForm({ user }) {
   };
   
   
+  
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center space-x-4">
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarImage src="https://i.pinimg.com/736x/43/0c/53/430c53ef3a97464b81b24b356ed39d32.jpg" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
