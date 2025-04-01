@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
         <Sidebar />
         
         {/* Main Content */}
-        <div className="pl-52">
+        <div className="pl-64">
           <CommonLayout>{children}</CommonLayout>
         </div>
         
