@@ -7,15 +7,16 @@ export default async function LoginPage() {
   // ตรวจสอบคุกกี้ 'token' จากฝั่งเซิร์ฟเวอร์
   const token = (await cookies()).get("token")?.value;
 
-  console.log("Token from cookies:", token); // แสดงคุกกี้ในคอนโซลเพื่อตรวจสอบ
+  console.log("✅ Token from cookies (Server):", token); // ใช้ใน dev server log เท่านั้น
   
   if (token) {
-    // ถ้ามี 'token' ให้รีไดเรกต์ไปยังหน้าโฮมเพจ
+    // ถ้ามี 'token' ให้ redirect ไปยังหน้าหลัก
     redirect("/");
   }
 
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row bg-gradient-to-br from-gray-100 to-gray-200">
+      {/* Left: Login form */}
       <div className="w-full md:w-1/2 flex items-center justify-center p-8 lg:p-12">
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-lg">
           <div className="space-y-2 text-center">
@@ -25,19 +26,25 @@ export default async function LoginPage() {
             <p className="text-sm text-gray-500">
               Welcome back! Please enter your details
             </p>
-            <LoginForm />
-            <p className="text-center text-sm text-gray-600">
-              Don't have an account?
-              <Link
-                className="font-semibold ml-3 text-black hover:text-black"
-                href={"/register"}
-              >
-                Register
-              </Link>
-            </p>
           </div>
+
+          {/* Login Form */}
+          <LoginForm />
+
+          {/* Register link */}
+          <p className="text-center text-sm text-gray-600">
+            Don't have an account?
+            <Link
+              className="font-semibold ml-2 text-black hover:text-black"
+              href={"/register"}
+            >
+              Register
+            </Link>
+          </p>
         </div>
       </div>
+
+      {/* Right: Banner Image */}
       <div className="hidden md:flex w-1/2 p-12 items-center justify-center relative">
         <div className="max-w-lg space-y-6 text-white z-10">
           <h2 className="text-4xl text-black font-medium">

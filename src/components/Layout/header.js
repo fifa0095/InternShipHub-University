@@ -50,9 +50,14 @@ export default function Header({ user }) {
   async function onSearchSubmit(data) {
     setIsLoading(true);
     try {
+      // Filter posts based on title and content
       const result = await searchPostsAction(data.query);
       if (result.success) {
-        setSearchResults(result.posts);
+        const filteredResults = result.posts.filter((post) =>
+          post.title.toLowerCase().includes(data.query.toLowerCase()) ||
+          post.content.toLowerCase().includes(data.query.toLowerCase())
+        );
+        setSearchResults(filteredResults);
         setIsSheetOpen(true);
         reset();
       } else {
@@ -144,9 +149,6 @@ export default function Header({ user }) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {/* <DropdownMenuItem>
-                    <span>Premium User</span>
-                  </DropdownMenuItem> */}
                   <DropdownMenuItem onClick={() => setIsEditProfileOpen(true)}>
                     <Edit className="h-4 w-4" />
                     <span>Edit Profile</span>

@@ -19,7 +19,7 @@ export default function HomeComponent({ posts }) {
         ? posts
         : posts.filter(
             (postItem) =>
-              Array.isArray(postItem.tags) && postItem.tags.includes(currentSelectedTag)
+              postItem.tags && postItem.tags.hasOwnProperty(currentSelectedTag)
           )
       : [];
 
@@ -59,16 +59,6 @@ export default function HomeComponent({ posts }) {
                     isGridView ? "flex flex-col" : "flex gap-6"
                   } bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden`}
                 >
-                  {/* {postItem.banner_link && (
-                    <div className={`${isGridView ? "w-full h-48" : "w-1/3 h-full"} relative`}>
-                      <img
-                        src={postItem.banner_link}
-                        alt={postItem?.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => (e.target.style.display = "none")}
-                      />
-                    </div>
-                  )} */}
                   <div className={`flex-1 p-4 ${isGridView ? "" : "w-2/3"}`}>
                     <div className="flex items-center space-x-2 mb-2">
                       <Avatar className="h-6 w-6">
@@ -94,11 +84,11 @@ export default function HomeComponent({ posts }) {
                     <div>
                       <span>{new Date(postItem?.createdAt).toLocaleDateString()}</span>
                     </div>
-                    {postItem.tags && postItem.tags.length > 0 && (
+                    {postItem.tags && Object.keys(postItem.tags).length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {postItem.tags.map((tag, index) => (
+                        {Object.keys(postItem.tags).map((category, index) => (
                           <span key={index} className="text-xs bg-gray-200 px-2 py-1 rounded-full">
-                            {tag}
+                            {category}
                           </span>
                         ))}
                       </div>
@@ -142,41 +132,6 @@ export default function HomeComponent({ posts }) {
                   >
                     {tagItem.value}
                   </Button>
-                                ))}
-                                </div>
-                              </div>
-                  
-                              {/* 🔥 Latest Blogs */}
-                              <div className="rounded-lg shadow-md p-6">
-                                <h3 className="font-bold text-gray-800 mb-4 text-xl">Latest Blogs</h3>
-                                <div className="space-y-4">
-                                  {posts &&
-                                    posts.slice(0, 4).map((postItem) => (
-                                      <div
-                                        onClick={() => router.push(`/blog/${postItem._id}`)}
-                                        key={postItem._id}
-                                        className="flex items-start space-x-4 cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition-colors duration-200"
-                                      >
-                                        <Avatar className="h-12 w-12">
-                                          <AvatarImage src={
-                                            postItem?.type === "auto_news"
-                                              ? "https://i.pinimg.com/736x/f1/7d/db/f17ddb244e3f2f6a720e61cd3f8161fb.jpg"
-                                              : "https://i.pinimg.com/736x/50/f2/91/50f2915c4f23c9643efb1c8f05020f2b.jpg"
-                                            } />
-                                          <AvatarFallback>
-                                            {postItem?.author || "Author"}
-                                          </AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex-1 space-y-1">
-                                          <h4 className="font-medium line-clamp-2 text-gray-800">{postItem?.title}</h4>
-                                          <div className="flex items-start space-x-2 text-xs text-gray-500">
-                                            <span className="text-[16px] font-bold">{postItem?.author?.name}</span>
-                                            <span className="text-[12px] font-medium text-black ml-1">
-                                              {new Date(postItem?.createdAt).toLocaleDateString()}
-                                            </span>
-                                          </div>
-                                        </div>
-                                      </div>
                 ))}
               </div>
             </div>
