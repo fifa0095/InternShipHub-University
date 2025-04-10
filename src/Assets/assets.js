@@ -10,8 +10,10 @@ import upload_area from './upload_area.png'
 import man from "./man.jpg"
 import home_icon from "./home_icon.png"
 import menu_icon from "./menu_icon.png"
+import agoda from "./agoda.png"
 
 export const assets = {
+    agoda,
     facebook_icon,
     googleplus_icon,
     twitter_icon,

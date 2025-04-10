@@ -182,15 +182,16 @@ export default function Page() {
             >
               ✖
             </button>
-            <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Prediction Result</h2>
-            <div className="flex gap-8">
+            <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Prediction Result : {jobInfo[result].title}</h2>
+            <div className="flex gap-8 h-100 w-100">
               {/* Left Section */}
               <div className="flex-none">
                 <img
-                  src={jobInfo[result].image}
+                  src="https://i.pinimg.com/736x/43/0c/53/430c53ef3a97464b81b24b356ed39d32.jpg"
                   alt={jobInfo[result].title}
                   className="w-48 h-48 object-cover rounded-lg shadow-md"
                 />
+                {/* <img src={assets.facebook_icon} alt="Facebook" /> */}
               </div>
 
               {/* Right Section: Image */}
