@@ -100,14 +100,23 @@ function BlogDetails({ post }) {
 
       {/* Blog Content */}
       <article className="prose lg:prose-xl whitespace-pre-line mb-8">
-        {post?.content && Array.isArray(post.content)
-          ? post.content.map((section, index) => (
+        {post?.type === "auto_news" ? (
+          post?.content && Array.isArray(post.content) ? (
+            post.content.map((section, index) => (
               <p key={index} className="mb-4">
                 {Array.isArray(section) ? section.join("\n") : section}
               </p>
             ))
-          : "No content available"}
+          ) : (
+            "No content available"
+          )
+        ) : post?.content ? (
+          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        ) : (
+          "No content available"
+        )}
       </article>
+
 
       {/* Source Link */}
       {post?.src_from && (

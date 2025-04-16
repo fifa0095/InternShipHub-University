@@ -1,14 +1,33 @@
 "use client";
+import { useState, useEffect } from "react";
 import { BuildingIcon, LayoutGrid, LayoutList } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { useRouter } from "next/navigation";
 
-export default function CompanyBlogsComponent({ posts }) {
+export default function CompanyBlogsComponent() {
+  const [posts, setPosts] = useState([]);
   const [isGridView, setIsGridView] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    // ดึงข้อมูลจาก API
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/getBlog");
+        const data = await response.json();
+        setPosts(data); // เก็บข้อมูลที่ได้จาก API
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []); // ใช้ empty dependency array เพื่อให้โหลดข้อมูลเพียงครั้งเดียว
+
+  // ฟิลเตอร์แค่โพสต์ที่มี type เป็น "Company"
+  const filteredPosts = posts.filter(post => post.type === "Company");
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
@@ -45,8 +64,8 @@ export default function CompanyBlogsComponent({ posts }) {
               isGridView ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-6"
             }`}
           >
-            {posts.length > 0 ? (
-              posts.map((postItem) => (
+            {filteredPosts.length > 0 ? (
+              filteredPosts.map((postItem) => (
                 <article
                   onClick={() => router.push(`/blog/${postItem._id}`)}
                   key={postItem._id}
@@ -121,8 +140,8 @@ export default function CompanyBlogsComponent({ posts }) {
                 Latest Company Reviews
               </h3>
               <div className="space-y-4">
-                {posts.length > 0 ? (
-                  posts.slice(0, 4).map((postItem) => (
+                {filteredPosts.length > 0 ? (
+                  filteredPosts.slice(0, 4).map((postItem) => (
                     <div
                       onClick={() => router.push(`/blog/${postItem._id}`)}
                       key={postItem._id}

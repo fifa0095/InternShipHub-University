@@ -10,27 +10,28 @@ import { UploadButton } from "@uploadthing/react";
 import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import dynamic from "next/dynamic";
-import Select from "react-select"; // เปลี่ยนเป็น react-select
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
-import "react-quill-new/dist/quill.snow.css";
-import "./quill-custom.css";
+import Select from "react-select";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BLOG_CATEGORIES, COMPANY_LIST } from "@/lib/config";
 
-// Schema สำหรับ Form Validation
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+import "react-quill-new/dist/quill.snow.css";
+import "./quill-custom.css";
+
 const blogPostSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  company_name: z.string().optional(), // เพิ่ม field สำหรับ company_name
-  content: z.array(z.string()).min(1, "Content is required"), // เปลี่ยนเป็น array
-  tags: z.array(z.string()).min(1, "At least one tag is required"), // อนุญาตให้เป็น array
+  company_name: z.string().min(1, "Company name is required"),
+  content: z.array(z.string()).min(1, "Content is required"),
+  tags: z.array(z.string()).min(1, "At least one tag is required"),
   src_from: z.string().optional(),
   banner_link: z.string().optional(),
+  type: z.string().optional(),
 });
 
 function CreateBlogForm({ user }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedTags, setSelectedTags] = useState([]); // ใช้จัดการค่าของ tags
+  const [selectedTags, setSelectedTags] = useState([]);
   const quillRef = useRef(null);
   const router = useRouter();
   const { toast } = useToast();
@@ -50,204 +51,185 @@ function CreateBlogForm({ user }) {
       tags: [],
       src_from: "",
       banner_link: "",
+      type: user?.isPremium ? "" : "Blog",
     },
   });
 
-  const title = watch("title");
-  const content = watch("content");
-
-  // ฟังก์ชันเมื่อผู้ใช้เลือก Tags
-  const handleTagChange = (selectedOptions) => {
-    console.log("Selected Tags:", selectedOptions); // Log selected tags
-    const tagValues = selectedOptions.map((option) => option.value);
-    setSelectedTags(tagValues);
-    setValue("tags", tagValues);
-  };
-
-  // ใช้ useEffect เพื่อเลื่อนการตั้งค่า selectedTags หลังจากที่การเรนเดอร์เสร็จสิ้น
   useEffect(() => {
-    console.log("Tags watch:", watch("tags")); // Log the watched tags
     setSelectedTags(watch("tags"));
   }, [watch("tags")]);
 
-
   const onBlogSubmit = async (data) => {
-    console.log("Form Data Before Submit:", data); // Debugging
-  
     setIsLoading(true);
+
+    const tagsObject = {};
+    data.tags.forEach((tag) => {
+      tagsObject[tag] = [];
+    });
+
     try {
-      const result = await fetch("http://localhost:8080/api/createBlog", { // Updated URL
+      const response = await fetch("http://localhost:8080/api/createBlog", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
         },
         body: JSON.stringify({
           ...data,
-          content: Array.isArray(data.content) ? data.content : [data.content], // Ensure content is an array
+          content: Array.isArray(data.content) ? data.content : [data.content],
+          tags: tagsObject,
+          type: user?.isPremium ? data.type || "Blog" : "Blog",
+          author: user?.userName ?? "anonymous",
         }),
-      }).then((res) => res.json());
-  
-      console.log("Submit Result:", result);
-  
+      });
+
+      const result = await response.json();
+
       if (result.success) {
-        toast({
-          title: "Success",
-          description: result.success,
-        });
+        toast({ title: "Success", description: result.success });
         router.push("/");
       } else {
-        toast({
-          title: "Error",
-          description: result.error,
-          variant: "destructive",
-        });
+        toast({ title: "Error", description: result.error, variant: "destructive" });
       }
     } catch (e) {
-      console.error("Error occurred:", e);
+      console.error("Submit Error:", e);
       toast({
         title: "Error",
-        description: "Some error occurred",
+        description: "Submission failed",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
-  
-  
-  
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+    <div className="max-w-7xl mx-auto px-4 pt-20">
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center space-x-4">
           <Avatar>
             <AvatarImage src="https://i.pinimg.com/736x/43/0c/53/430c53ef3a97464b81b24b356ed39d32.jpg" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <div>
-            <p className="font-semibold">{user?.userName}</p>
-          </div>
+          <p className="font-semibold">{user?.userName}</p>
         </div>
-        <Button disabled={!title || !content || selectedTags.length === 0 || isLoading} onClick={handleSubmit(onBlogSubmit)}>
+        <Button
+          disabled={!watch("title") || !watch("content") || selectedTags.length === 0 || isLoading}
+          onClick={handleSubmit(onBlogSubmit)}
+        >
           Publish
         </Button>
       </header>
 
       <main>
         <form>
-          {/* Input สำหรับ Title */}
+          {/* Type (Only for Premium User) */}
+          {user?.isPremium && (
+            <Controller
+              name="type"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  options={[
+                    { value: "blog", label: "Blog" },
+                    { value: "company", label: "Company" },
+                  ]}
+                  value={
+                    field.value
+                      ? { value: field.value, label: field.value }
+                      : null
+                  }
+                  onChange={(option) => field.onChange(option?.value ?? "")}
+                  placeholder="Select Type"
+                  className="mb-4"
+                />
+              )}
+            />
+          )}
+
+          {/* Title */}
           <Controller
             name="title"
             control={control}
             render={({ field }) => (
-              <Input {...field} type="text" placeholder="Title" className="text-4xl font-bold border-none outline-none mb-4 p-0 focus-visible:ring-0" />
+              <Input {...field} type="text" placeholder="Title" className="text-4xl font-bold mb-4 border-none outline-none focus:ring-0" />
             )}
           />
-          {errors.title && <p className="text-sm text-red-600 mt-2">{errors.title.message}</p>}
- 
-          {/* เพิ่ม Input สำหรับ Company Name */}
-          <Controller
-  name="company_name"
-  control={control}
-  render={({ field }) => {
-    const selectedCompany = COMPANY_LIST.find((company) => company.key === field.value);
-    return (
-      <div>
-        <Select
-          options={COMPANY_LIST.map((company) => ({
-            value: company.key,
-            label: company.value,
-          }))}
-          className="mb-4"
-          value={selectedCompany ? { value: selectedCompany.key, label: selectedCompany.value } : null}
-          onChange={(selectedOption) => field.onChange(selectedOption ? selectedOption.value : "")}
-          placeholder="Select a Company..."
-          isClearable
-        />
-        {/* {selectedCompany && (
-          <p className="text-sm text-gray-700 mt-2">Selected: {selectedCompany.value}</p>
-        )} */}
-      </div>
-    );
-  }}
-/>
-{errors.company_name && <p className="text-sm text-red-600 mt-2">{errors.company_name.message}</p>}
+          {errors.title && <p className="text-red-600 text-sm">{errors.title.message}</p>}
 
-          {/* ใช้ react-select เพื่อเลือกหลาย tags */}
+          {/* Company Name */}
+          <Controller
+            name="company_name"
+            control={control}
+            render={({ field }) => {
+              const selected = COMPANY_LIST.find((c) => c.key === field.value);
+              return (
+                <Select
+                  options={COMPANY_LIST.map((c) => ({ value: c.key, label: c.value }))}
+                  value={selected ? { value: selected.key, label: selected.value } : null}
+                  onChange={(option) => field.onChange(option?.value ?? "")}
+                  placeholder="Select a Company..."
+                  isClearable
+                  className="mb-4"
+                />
+              );
+            }}
+          />
+          {errors.company_name && <p className="text-red-600 text-sm">{errors.company_name.message}</p>}
+
+          {/* Tags */}
           <Controller
             name="tags"
             control={control}
             render={({ field }) => (
-              <div>
-                {/* react-select */}
-                <Select
-                  isMulti
-                  options={BLOG_CATEGORIES.map((tagsItem) => ({
-                    value: tagsItem.key,
-                    label: tagsItem.value,
-                  }))}
-                  className="mb-4"
-                  value={BLOG_CATEGORIES.filter((tagsItem) =>
-                    field.value.includes(tagsItem.key)
-                  ).map((item) => ({
-                    value: item.key,
-                    label: item.value,
-                  }))}
-                  onChange={(selectedOptions) => {
-                    console.log("Tag Selected:", selectedOptions); // Log the selected tags from react-select
-                    field.onChange(selectedOptions.map((option) => option.value));
-                  }}
-                />
-              </div>
+              <Select
+                isMulti
+                options={BLOG_CATEGORIES.map((t) => ({ value: t.key, label: t.value }))}
+                value={BLOG_CATEGORIES.filter((t) => field.value.includes(t.key)).map((t) => ({
+                  value: t.key,
+                  label: t.value,
+                }))}
+                onChange={(options) => field.onChange(options.map((opt) => opt.value))}
+                className="mb-4"
+              />
             )}
           />
-          {errors.tags && <p className="text-sm text-red-600 mt-2">{errors.tags.message}</p>}
+          {errors.tags && <p className="text-red-600 text-sm">{errors.tags.message}</p>}
 
-          {/* Input สำหรับแหล่งที่มา */}
+          {/* Source From */}
           <Controller
             name="src_from"
             control={control}
             render={({ field }) => (
-              <Input {...field} type="text" placeholder="Source (Optional)" className="text-xl font-normal border-none outline-none mb-4 p-0 focus-visible:ring-0" />
+              <Input {...field} type="text" placeholder="Source (Optional)" className="mb-4 border-none outline-none focus:ring-0" />
             )}
           />
 
-          {/* Input สำหรับเพิ่มรูปภาพ */}
+          {/* Banner Upload */}
           <div className="flex items-center mb-6">
             <UploadButton
+              endpoint="imageUploader"
               content={{
                 button: (
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <PlusCircle className="h-4 w-4 text-white" />
-                    <span className="text-[12px]">Add Cover Image</span>
+                    <span className="text-xs">Add Cover Image</span>
                   </div>
                 ),
               }}
               className="mt-4 ut-button:bg-black ut-button:ut-readying:bg-black"
-              endpoint="imageUploader"
               onClientUploadComplete={(res) => {
-                console.log("Image Upload Result:", res); // Log the upload result
                 if (res && res[0]) {
                   setValue("banner_link", res[0].url);
-                  toast({
-                    title: "Success",
-                    description: "Image uploaded successfully",
-                  });
+                  toast({ title: "Success", description: "Image uploaded" });
                 }
               }}
               onUploadError={(error) => {
-                console.error("Image Upload Error:", error); // Log any upload errors
-                toast({
-                  title: "Error",
-                  description: `Upload Failed: ${error.message}`,
-                  variant: "destructive",
-                });
+                toast({ title: "Error", description: error.message, variant: "destructive" });
               }}
             />
           </div>
 
-          {/* Editor สำหรับเนื้อหาบล็อก */}
+          {/* Content */}
           <Controller
             name="content"
             control={control}
@@ -255,18 +237,17 @@ function CreateBlogForm({ user }) {
               <ReactQuill
                 ref={quillRef}
                 theme="snow"
-                value={field.value.join("\n")} // รวม array กลับเป็น string เพื่อแสดงผล
-                onChange={(newValue) => {
-                  const contentLines = newValue.split("\n").filter(line => line.trim() !== ""); // แยกเนื้อหาเป็น array
-                  field.onChange(contentLines); // อัปเดตค่าใน form
+                value={field.value.join("\n")}
+                onChange={(val) => {
+                  const lines = val.split("\n").filter((line) => line.trim() !== "");
+                  field.onChange(lines);
                 }}
                 placeholder="Write your story..."
                 className="quill-editor"
               />
             )}
           />
-
-
+          {errors.content && <p className="text-red-600 text-sm">{errors.content.message}</p>}
         </form>
       </main>
     </div>

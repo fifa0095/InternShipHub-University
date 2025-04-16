@@ -13,16 +13,19 @@ export default function HomeComponent({ posts }) {
   const [currentSelectedTag, setCurrentSelectedTag] = useState("");
   const router = useRouter();
 
+  // จัดเรียง posts โดยใช้ createdAt ในการจัดลำดับให้บล็อกที่ใหม่กว่าปรากฏบนสุด
   const filteredPosts =
     posts && posts.length > 0
-      ? currentSelectedTag === ""
-        ? posts
-        : posts.filter(
+      ? posts
+          .filter(postItem => postItem.type === 'blog')  // กรองเฉพาะที่ type เป็น 'blog'
+          .filter(
             (postItem) =>
-              postItem.tags && postItem.tags.hasOwnProperty(currentSelectedTag)
+              currentSelectedTag === "" ||
+              (postItem.tags && postItem.tags.hasOwnProperty(currentSelectedTag))
           )
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // จัดเรียงโดยวันที่สร้าง
       : [];
-
+      
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
       <div className="flex justify-between items-center mb-6">
