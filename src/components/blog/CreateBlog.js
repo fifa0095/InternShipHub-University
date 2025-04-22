@@ -31,7 +31,8 @@ const blogPostSchema = z.object({
 
 function CreateBlogForm({ user }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [isOtherCompany, setIsOtherCompany] = useState(false);
+  const [otherCompanyName, setOtherCompanyName] = useState("");
   const quillRef = useRef(null);
   const router = useRouter();
   const { toast } = useToast();
@@ -56,11 +57,19 @@ function CreateBlogForm({ user }) {
   });
 
   useEffect(() => {
-    setSelectedTags(watch("tags"));
-  }, [watch("tags")]);
+    const subscription = watch((value, { name }) => {
+      if (name === "company_name") {
+        setIsOtherCompany(value.company_name === "other");
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const onBlogSubmit = async (data) => {
     setIsLoading(true);
+
+    const companyNameToUse =
+      data.company_name === "other" ? otherCompanyName : data.company_name;
 
     const tagsObject = {};
     data.tags.forEach((tag) => {
@@ -70,11 +79,10 @@ function CreateBlogForm({ user }) {
     try {
       const response = await fetch("http://localhost:8080/api/createBlog", {
         method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
+        headers: { "Content-type": "application/json" },
         body: JSON.stringify({
           ...data,
+          company_name: companyNameToUse,
           content: Array.isArray(data.content) ? data.content : [data.content],
           tags: tagsObject,
           type: user?.isPremium ? data.type || "Blog" : "Blog",
@@ -91,12 +99,7 @@ function CreateBlogForm({ user }) {
         toast({ title: "Error", description: result.error, variant: "destructive" });
       }
     } catch (e) {
-      console.error("Submit Error:", e);
-      toast({
-        title: "Error",
-        description: "Submission failed",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Submission failed", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +116,13 @@ function CreateBlogForm({ user }) {
           <p className="font-semibold">{user?.userName}</p>
         </div>
         <Button
-          disabled={!watch("title") || !watch("content") || selectedTags.length === 0 || isLoading}
+          disabled={
+            !watch("title") ||
+            !watch("content").length ||
+            (!watch("tags")?.length) ||
+            (watch("company_name") === "other" && !otherCompanyName) ||
+            isLoading
+          }
           onClick={handleSubmit(onBlogSubmit)}
         >
           Publish
@@ -122,7 +131,7 @@ function CreateBlogForm({ user }) {
 
       <main>
         <form>
-          {/* Type (Only for Premium User) */}
+          {/* Type */}
           {user?.isPremium && (
             <Controller
               name="type"
@@ -130,15 +139,11 @@ function CreateBlogForm({ user }) {
               render={({ field }) => (
                 <Select
                   options={[
-                    { value: "blog", label: "Blog" },
-                    { value: "company", label: "Company" },
+                    { value: "Blog", label: "Blog" },
+                    { value: "company_reviews", label: "Company Reviews" },
                   ]}
-                  value={
-                    field.value
-                      ? { value: field.value, label: field.value }
-                      : null
-                  }
-                  onChange={(option) => field.onChange(option?.value ?? "")}
+                  value={field.value ? { value: field.value, label: field.value } : null}
+                  onChange={(option) => field.onChange(option?.value)}
                   placeholder="Select Type"
                   className="mb-4"
                 />
@@ -151,29 +156,46 @@ function CreateBlogForm({ user }) {
             name="title"
             control={control}
             render={({ field }) => (
-              <Input {...field} type="text" placeholder="Title" className="text-4xl font-bold mb-4 border-none outline-none focus:ring-0" />
+              <Input
+                {...field}
+                type="text"
+                placeholder="Title"
+                className="text-4xl font-bold mb-4 border-none outline-none focus:ring-0"
+                onChange={(e) => field.onChange(e.target.value)}
+              />
             )}
           />
           {errors.title && <p className="text-red-600 text-sm">{errors.title.message}</p>}
 
-          {/* Company Name */}
+          {/* Company */}
           <Controller
             name="company_name"
             control={control}
             render={({ field }) => {
-              const selected = COMPANY_LIST.find((c) => c.key === field.value);
+              const selected = COMPANY_LIST.find((c) => c.key === field.value) || (field.value === "other" ? { key: "other", value: "Other" } : null);
               return (
                 <Select
-                  options={COMPANY_LIST.map((c) => ({ value: c.key, label: c.value }))}
+                  options={[
+                    ...COMPANY_LIST.map((c) => ({ value: c.key, label: c.value })),
+                    { value: "other", label: "Other" },
+                  ]}
                   value={selected ? { value: selected.key, label: selected.value } : null}
                   onChange={(option) => field.onChange(option?.value ?? "")}
                   placeholder="Select a Company..."
                   isClearable
-                  className="mb-4"
+                  className="mb-2"
                 />
               );
             }}
           />
+          {isOtherCompany && (
+            <Input
+              value={otherCompanyName}
+              onChange={(e) => setOtherCompanyName(e.target.value)}
+              placeholder="Enter company name"
+              className="mb-4"
+            />
+          )}
           {errors.company_name && <p className="text-red-600 text-sm">{errors.company_name.message}</p>}
 
           {/* Tags */}
@@ -184,9 +206,9 @@ function CreateBlogForm({ user }) {
               <Select
                 isMulti
                 options={BLOG_CATEGORIES.map((t) => ({ value: t.key, label: t.value }))}
-                value={BLOG_CATEGORIES.filter((t) => field.value.includes(t.key)).map((t) => ({
-                  value: t.key,
-                  label: t.value,
+                value={field.value.map((val) => ({
+                  value: val,
+                  label: BLOG_CATEGORIES.find((cat) => cat.key === val)?.value || val,
                 }))}
                 onChange={(options) => field.onChange(options.map((opt) => opt.value))}
                 className="mb-4"
@@ -195,12 +217,18 @@ function CreateBlogForm({ user }) {
           />
           {errors.tags && <p className="text-red-600 text-sm">{errors.tags.message}</p>}
 
-          {/* Source From */}
+          {/* Source */}
           <Controller
             name="src_from"
             control={control}
             render={({ field }) => (
-              <Input {...field} type="text" placeholder="Source (Optional)" className="mb-4 border-none outline-none focus:ring-0" />
+              <Input
+                {...field}
+                type="text"
+                placeholder="Source (Optional)"
+                className="mb-4 border-none outline-none focus:ring-0"
+                onChange={(e) => field.onChange(e.target.value)}
+              />
             )}
           />
 

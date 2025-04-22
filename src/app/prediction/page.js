@@ -229,72 +229,83 @@ export default function Page() {
       </header>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-6 mt-6 bg-white shadow-md rounded-lg">
-        <h1 className="text-3xl font-bold mb-8 text-gray-800 text-left">Predict from Resume Info</h1>
+<form onSubmit={handleSubmit} className="max-w-6xl mx-auto p-6 mt-6 bg-white shadow-md rounded-lg">
+  {/* <h1 className="text-3xl font-bold mb-8 text-gray-800 text-left">Predict from Resume Info</h1> */}
 
-        <label className="block mb-2 font-medium">Upload PDF (Optional)</label>
-        <input
-          type="file"
-          name="file"
-          accept=".pdf"
-          onChange={onChangeHandler}
-          className="mb-4 w-full border px-3 py-2"
-        />
+  <div className="flex flex-col md:flex-row">
+{/* Left Section: Upload */}
+<div className="md:w-1/2 pr-0 md:pr-6 md:border-r border-gray-300 mb-6 md:mb-0 flex justify-center items-center flex-col">
+  <label className="block mb-2 font-medium">Upload PDF (Optional)</label>
+  <input
+    type="file"
+    name="file"
+    accept=".pdf"
+    onChange={onChangeHandler}
+    className="mb-4 w-[80%] border px-3 py-2"
+  />
+</div>
 
-        <label className="block mb-2 font-medium">Skill *</label>
-        <input
-          type="text"
-          name="skill"
-          value={form.skill}
-          onChange={onChangeHandler}
-          placeholder="e.g., JavaScript, Python, React"
-          required
-          className="mb-4 w-full border px-3 py-2"
-        />
 
-        <label className="block mb-2 font-medium">Educational *</label>
-        <input
-          type="text"
-          name="educational"
-          value={form.educational}
-          onChange={onChangeHandler}
-          placeholder="e.g., Bachelor's in Computer Engineering"
-          required
-          className="mb-4 w-full border px-3 py-2"
-        />
+    {/* Right Section: Text Inputs */}
+    <div className="md:w-1/2 pl-0 md:pl-6">
+      <label className="block mb-2 font-medium">Skill *</label>
+      <input
+        type="text"
+        name="skill"
+        value={form.skill}
+        onChange={onChangeHandler}
+        placeholder="e.g., JavaScript, Python, React"
+        required
+        className="mb-4 w-full border px-3 py-2"
+      />
 
-        <label className="block mb-2 font-medium">Experience *</label>
-        <textarea
-          name="experience"
-          value={form.experience}
-          onChange={onChangeHandler}
-          placeholder="e.g., Built a web app using scraping and Express.js"
-          required
-          className="mb-4 w-full border px-3 py-2"
-        />
+      <label className="block mb-2 font-medium">Educational *</label>
+      <input
+        type="text"
+        name="educational"
+        value={form.educational}
+        onChange={onChangeHandler}
+        placeholder="e.g., Bachelor's in Computer Engineering"
+        required
+        className="mb-4 w-full border px-3 py-2"
+      />
 
-        <div className="flex justify-between gap-3">
-          {["Cloud Management", "Data & AI", "Designer", "Developer", "QA & Tester", "Security"].map((role) => (
-            <button
-              key={role}
-              type="button"
-              className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600"
-              onClick={() => handleMockData(role)}
-            >
-              {role}
-            </button>
-          ))}
-        </div>
+      <label className="block mb-2 font-medium">Experience *</label>
+      <textarea
+        name="experience"
+        value={form.experience}
+        onChange={onChangeHandler}
+        placeholder="e.g., Built a web app using scraping and Express.js"
+        required
+        className="mb-4 w-full border px-3 py-2"
+      />
+    </div>
+  </div>
 
-        <div className="mt-8 text-center">
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600"
-          >
-            Submit Prediction
-          </button>
-        </div>
-      </form>
+
+  <div className="flex flex-wrap gap-3 justify-center mt-6">
+    {["Cloud Management", "Data & AI", "Designer", "Developer", "QA & Tester", "Security"].map((role) => (
+      <button
+        key={role}
+        type="button"
+        className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600"
+        onClick={() => handleMockData(role)}
+      >
+        {role}
+      </button>
+    ))}
+  </div>
+
+  <div className="mt-8 text-center">
+    <button
+      type="submit"
+      className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600"
+    >
+      Submit
+    </button>
+  </div>
+</form>
+
     </div>
   );
 }

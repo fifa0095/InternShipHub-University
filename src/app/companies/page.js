@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 export default async function CompaniesPage() {
   try {
-    const response = await fetch("http://localhost:8080/api/getBlog");
+    const response = await fetch("http://localhost:8080/api/getAllBlog");
 
     if (!response.ok) {
       throw new Error("Failed to fetch blog data");

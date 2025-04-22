@@ -17,7 +17,7 @@ export default function HomeComponent({ posts }) {
   const filteredPosts =
     posts && posts.length > 0
       ? posts
-          .filter(postItem => postItem.type === 'blog')  // กรองเฉพาะที่ type เป็น 'blog'
+          .filter((postItem) => postItem.type === "user_blogs" || postItem.type === "auto_news")
           .filter(
             (postItem) =>
               currentSelectedTag === "" ||

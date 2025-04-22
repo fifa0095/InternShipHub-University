@@ -15,7 +15,7 @@ export default function CompanyBlogsComponent() {
     // ดึงข้อมูลจาก API
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/getBlog");
+        const response = await fetch("http://localhost:8080/api/getReview");
         const data = await response.json();
         setPosts(data); // เก็บข้อมูลที่ได้จาก API
       } catch (error) {
@@ -27,7 +27,7 @@ export default function CompanyBlogsComponent() {
   }, []); // ใช้ empty dependency array เพื่อให้โหลดข้อมูลเพียงครั้งเดียว
 
   // ฟิลเตอร์แค่โพสต์ที่มี type เป็น "Company"
-  const filteredPosts = posts.filter(post => post.type === "Company");
+  const filteredPosts = posts.filter(post => post.type === "company_reviews");
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
@@ -133,7 +133,7 @@ export default function CompanyBlogsComponent() {
         </div>
 
         {/* Sidebar for Latest Company Reviews */}
-        <div className="w-full lg:w-4/12">
+        {/* <div className="w-full lg:w-4/12">
           <div className="sticky top-32 space-y-8">
             <div className="rounded-lg shadow-md p-6">
               <h3 className="font-bold text-gray-800 mb-4 text-xl">
@@ -176,7 +176,7 @@ export default function CompanyBlogsComponent() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </main>
   );

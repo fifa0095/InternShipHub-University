@@ -17,6 +17,6 @@ export const COMPANY_LIST = [
   { key: "scg", value: "SCG" },
   { key: "ais", value: "Advanced Info Service Public Company Limited (AIS)" },
   { key: "kbank", value: "Kasikornbank Public Company Limited (KBank)" },
-  { key: "other", value: "Other" },
+  // { key: "other", value: "Other" },
 
 ];

@@ -9,7 +9,7 @@ export default function DataVirtualization() {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/getBlog");
+        const response = await fetch("http://localhost:8080/api/getAllBlog");
         const blogs = await response.json();
 
         const tagCategoryCounts = {};
