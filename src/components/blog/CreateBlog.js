@@ -139,7 +139,7 @@ function CreateBlogForm({ user }) {
               render={({ field }) => (
                 <Select
                   options={[
-                    { value: "Blog", label: "Blog" },
+                    { value: "user_blogs", label: "Blog" },
                     { value: "company_reviews", label: "Company Reviews" },
                   ]}
                   value={field.value ? { value: field.value, label: field.value } : null}

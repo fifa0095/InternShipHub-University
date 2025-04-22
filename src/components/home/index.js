@@ -1,19 +1,22 @@
 "use client";
-import { LayoutGrid, LayoutList } from "lucide-react";
+import { LayoutGrid, LayoutList, Search } from "lucide-react";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { BLOG_CATEGORIES } from "@/lib/config";
 import { useRouter } from "next/navigation";
 import { assets } from "@/Assets/assets";
 
-export default function HomeComponent({ posts }) {
+export default function HomeComponent({ posts: initialPosts }) {
   const [isGridView, setIsGridView] = useState(false);
   const [currentSelectedTag, setCurrentSelectedTag] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [posts, setPosts] = useState(initialPosts || []);
   const router = useRouter();
 
-  // จัดเรียง posts โดยใช้ createdAt ในการจัดลำดับให้บล็อกที่ใหม่กว่าปรากฏบนสุด
+  // Filter posts based on selected tag
   const filteredPosts =
     posts && posts.length > 0
       ? posts
@@ -23,8 +26,42 @@ export default function HomeComponent({ posts }) {
               currentSelectedTag === "" ||
               (postItem.tags && postItem.tags.hasOwnProperty(currentSelectedTag))
           )
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // จัดเรียงโดยวันที่สร้าง
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       : [];
+
+  // Handle search submissions
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    
+    if (!searchTerm.trim()) {
+      setPosts(initialPosts);
+      return;
+    }
+    
+    setIsSearching(true);
+    
+    try {
+      const response = await fetch(`http://localhost:8080/api/search/${encodeURIComponent(searchTerm)}`);
+      
+      if (!response.ok) {
+        throw new Error('Search request failed');
+      }
+      
+      const searchResults = await response.json();
+      setPosts(searchResults);
+    } catch (error) {
+      console.error("Search error:", error);
+      // Optionally show an error message to the user
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Reset search when tag changes
+  useEffect(() => {
+    setPosts(initialPosts);
+    setSearchTerm("");
+  }, [currentSelectedTag, initialPosts]);
       
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
@@ -50,6 +87,32 @@ export default function HomeComponent({ posts }) {
           </Button>
         </div>
       </div>
+      
+      {/* Search Bar */}
+      <div className="mb-6">
+        <form onSubmit={handleSearch} className="flex w-full max-w-lg">
+          <div className="relative flex-grow">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Search blogs..."
+            />
+          </div>
+          <Button 
+            type="submit" 
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSearching}
+          >
+            {isSearching ? 'Searching...' : 'Search'}
+          </Button>
+        </form>
+      </div>
+      
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-8/12">
           <div className={`${isGridView ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-6"}`}>
@@ -110,7 +173,10 @@ export default function HomeComponent({ posts }) {
                 </article>
               ))
             ) : (
-              <h2 className="font-bold text-4xl">No Blogs Found!</h2>
+              <div className="text-center py-8">
+                <h2 className="font-bold text-2xl mb-2">No Blogs Found!</h2>
+                <p className="text-gray-600">Try adjusting your search or filter criteria</p>
+              </div>
             )}
           </div>
         </div>
