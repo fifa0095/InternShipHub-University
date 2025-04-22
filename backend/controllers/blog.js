@@ -79,81 +79,215 @@ exports.deleteBlog = async (req, res) => {
     }
 };
 
-
 exports.searchBlogs = async (req, res) => {
-    try {
-        const { keyword } = req.params;
+  try {
+    const { keyword } = req.params;
         if (!keyword) {
             return res.status(400).json({ message: 'Keyword is required' });
         }
 
         const keywordRegex = new RegExp(keyword, "i");
 
-const blogs = await Blog.aggregate([
-  {
-    $match: {
-      $or: [
-        { title: { $regex: keywordRegex } },
-        { company_name: { $regex: keywordRegex } }
-      ]
-    }
-  },
-  {
-    $addFields: {
-      tagsArray: { $objectToArray: "$tags" }
-    }
-  },
-  {
-    $match: {
-      $expr: {
-        $gt: [
+        console.log(keywordRegex);
+
+        // const blogs = await Blog.find({title: { $regex: keywordRegex }});
+        // const blogs = await Blog.find({company_name: { $regex: keywordRegex }});
+        // const blogs = await Blog.aggregate([
+        //   {
+        //     $addFields: {
+        //       tagsArray: {
+        //         $cond: [
+        //           { $eq: [{ $type: "$tags" }, "object"] },
+        //           { $objectToArray: "$tags" },
+        //           []
+        //         ]
+        //       }
+        //     }
+        //   },
+        //   {
+        //     $unwind: {
+        //       path: "$tagsArray",
+        //       preserveNullAndEmptyArrays: true
+        //     }
+        //   },
+        //   {
+        //     $match: {
+        //       $or: [
+        //         { "tagsArray.k": { $regex: keywordRegex } },
+        //         { "tagsArray.v": { $regex: keywordRegex } },
+        //         {
+        //           $expr: {
+        //             $and: [
+        //               { $eq: [{ $type: "$tagsArray.v" }, "array"] },
+        //               {
+        //                 $gt: [
+        //                   {
+        //                     $size: {
+        //                       $filter: {
+        //                         input: "$tagsArray.v",
+        //                         as: "tagValue",
+        //                         cond: { $regexMatch: { input: "$$tagValue", regex: keywordRegex } }
+        //                       }
+        //                     }
+        //                   },
+        //                   0
+        //                 ]
+        //               }
+        //             ]
+        //           }
+        //         }
+        //       ]
+        //     }
+        //   },
+        //   {
+        //     $project: {
+        //       title: 1,
+        //       content: 1,
+        //       tags: 1
+        //     }
+        //   }
+        // ]);
+
+        const blogs = await Blog.aggregate([
           {
-            $size: {
-              $filter: {
-                input: "$tagsArray",
-                as: "tagItem",
-                cond: {
-                  $or: [
-                    // match the key
-                    { $regexMatch: { input: "$$tagItem.k", regex: keywordRegex } },
-                    // match inside the values if it's an array
-                    {
-                      $and: [
-                        { $isArray: "$$tagItem.v" },
-                        {
-                          $gt: [
-                            {
-                              $size: {
-                                $filter: {
-                                  input: "$$tagItem.v",
-                                  as: "tagValue",
-                                  cond: {
-                                    $regexMatch: { input: "$$tagValue", regex: keywordRegex }
-                                  }
-                                }
-                              }
-                            },
-                            0
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
+            $addFields: {
+              tagsArray: {
+                $cond: [
+                  { $eq: [{ $type: "$tags" }, "object"] },
+                  { $objectToArray: "$tags" },
+                  []
+                ]
               }
             }
           },
-          0
-        ]
-      }
-    }
-  }
-]);
-
-
+          {
+            $unwind: {
+              path: "$tagsArray",
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $match: {
+              $or: [
+                { title: { $regex: keywordRegex } },
+                { company_name: { $regex: keywordRegex } },
+                { "tagsArray.k": { $regex: keywordRegex } },
+                { "tagsArray.v": { $regex: keywordRegex } },
+                {
+                  $expr: {
+                    $and: [
+                      { $eq: [{ $type: "$tagsArray.v" }, "array"] },
+                      {
+                        $gt: [
+                          {
+                            $size: {
+                              $filter: {
+                                input: "$tagsArray.v",
+                                as: "tagValue",
+                                cond: { $regexMatch: { input: "$$tagValue", regex: keywordRegex } }
+                              }
+                            }
+                          },
+                          0
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            $project: {
+              title: 1,
+              content: 1,
+              company_name: 1,
+              tags: 1
+            }
+          }
+        ]);
+        
         res.json(blogs);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server Error' });
-    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
 };
+
+
+// exports.searchBlogs = async (req, res) => {
+//     try {
+//         const { keyword } = req.params;
+//         if (!keyword) {
+//             return res.status(400).json({ message: 'Keyword is required' });
+//         }
+
+//         const keywordRegex = new RegExp(keyword, "i");
+
+//         console.log(keywordRegex);
+//         const blogs = await Blog.aggregate([
+//           {
+//             $match: {
+//               $or: [
+//                 { title: { $regex: keywordRegex } },
+//                 { company_name: { $regex: keywordRegex } }
+//               ]
+//             }
+//           },
+//           {
+//             $addFields: {
+//               tagsArray: { $objectToArray: "$tags" }
+//             }
+//           },
+//           {
+//             $match: {
+//               $expr: {
+//                 $gt: [
+//                   {
+//                     $size: {
+//                       $filter: {
+//                         input: "$tagsArray",
+//                         as: "tagItem",
+//                         cond: {
+//                           $or: [
+//                             { $regexMatch: { input: "$$tagItem.k", regex: keywordRegex } },
+//                             {
+//                               $and: [
+//                                 { $isArray: "$$tagItem.v" },
+//                                 {
+//                                   $gt: [
+//                                     {
+//                                       $size: {
+//                                         $filter: {
+//                                           input: "$$tagItem.v",
+//                                           as: "tagValue",
+//                                           cond: {
+//                                             $regexMatch: { input: "$$tagValue", regex: keywordRegex }
+//                                           }
+//                                         }
+//                                       }
+//                                     },
+//                                     0
+//                                   ]
+//                                 }
+//                               ]
+//                             }
+//                           ]
+//                         }
+//                       }
+//                     }
+//                   },
+//                   0
+//                 ]
+//               }
+//             }
+//           }
+//         ]).collation({ locale: 'th', strength: 1 });
+
+
+//         res.json(blogs);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ message: 'Server Error' });
+//     }
+// };
