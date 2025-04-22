@@ -15,8 +15,8 @@ export async function middleware(request) {
 
   const { pathname } = request.nextUrl;
 
-  // ✅ ไม่ต้องล็อกอินเฉพาะ path "/"
-  const isUnprotectedRoute = pathname === "/";
+  // ✅ ไม่ต้องล็อกอินเฉพาะ path "/", "/login" และ "/register"
+  const isUnprotectedRoute = pathname === "/" || pathname === "/login" || pathname === "/register";
 
   if (!isUnprotectedRoute) {
     const token = request.cookies.get("token")?.value;

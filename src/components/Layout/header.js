@@ -120,45 +120,39 @@ export default function Header({ user }) {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="relative hidden md:block">
-                <Input
-                  {...register("query")}
-                  type="text"
-                  placeholder="Search blogs..."
-                  className="pl-10 pr-4 py-1 w-64 rounded-full bg-gray-100 border-0 focus-visible:ring-1"
-                />
-                <Search
-                  onClick={handleSubmit(onSearchSubmit)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4 cursor-pointer"
-                />
-              </div>
-              <Button
-                onClick={() => router.push("/blog/create")}
-                variant="ghost"
-                size="icon"
-              >
-                <Edit className="h-6 w-6" />
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Avatar className="h-8 w-8 cursor-pointer">
-                    <AvatarImage src="https://i.pinimg.com/736x/43/0c/53/430c53ef3a97464b81b24b356ed39d32.jpg" />
-                    <AvatarFallback>Unknown</AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setIsEditProfileOpen(true)}>
-                    <Edit className="h-4 w-4" />
-                    <span>Edit Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="h-4 w-4" />
-                    <span>Log Out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {user ? (
+                <>
+                  <Button
+                    onClick={() => router.push("/blog/create")}
+                    variant="ghost"
+                    size="icon"
+                  >
+                    <Edit className="h-6 w-6" />
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Avatar className="h-8 w-8 cursor-pointer">
+                        <AvatarImage src={user.avatar || "default-avatar.jpg"} />
+                        <AvatarFallback>Unknown</AvatarFallback>
+                      </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => setIsEditProfileOpen(true)}>
+                        <Edit className="h-4 w-4" />
+                        <span>Edit Profile</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="h-4 w-4" />
+                        <span>Log Out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              ) : (
+                <Button onClick={() => router.push("/login")}>Login</Button>
+              )}
             </div>
           </div>
         </div>
@@ -197,7 +191,7 @@ export default function Header({ user }) {
       </Dialog>
 
       {/* Search Results Sheet */}
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+      {/* <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent
           side="right"
           className="w-full sm:w-[540px] sm:max-w-full"
@@ -255,7 +249,7 @@ export default function Header({ user }) {
             )}
           </div>
         </SheetContent>
-      </Sheet>
+      </Sheet> */}
     </header>
   );
 }
