@@ -7,6 +7,7 @@ import { AvatarFallback } from "@radix-ui/react-avatar";
 import { BLOG_CATEGORIES } from "@/lib/config";
 import { useRouter } from "next/navigation";
 import { assets } from "@/Assets/assets";
+import { Input } from "../ui/input"; // Make sure you have this component
 
 export default function HomeComponent({ posts: initialPosts }) {
   const [isGridView, setIsGridView] = useState(false);
@@ -17,10 +18,10 @@ export default function HomeComponent({ posts: initialPosts }) {
   const router = useRouter();
 
   // Filter posts based on selected tag
+// Filter posts based on selected tag (without type filtering)
   const filteredPosts =
     posts && posts.length > 0
       ? posts
-          .filter((postItem) => postItem.type === "user_blogs" || postItem.type === "auto_news")
           .filter(
             (postItem) =>
               currentSelectedTag === "" ||
@@ -29,39 +30,43 @@ export default function HomeComponent({ posts: initialPosts }) {
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       : [];
 
-  // Handle search submissions
+
+  // Reset search when tag changes
+  useEffect(() => {
+    if (searchTerm === "") {
+      setPosts(initialPosts);
+    }
+  }, [currentSelectedTag, initialPosts, searchTerm]);
+
+  // Handle search
   const handleSearch = async (e) => {
     e.preventDefault();
-    
-    if (!searchTerm.trim()) {
+
+    if (searchTerm.trim() === "") {
       setPosts(initialPosts);
       return;
     }
-    
-    setIsSearching(true);
-    
+
     try {
+      console.log("🔍 Searching for:", searchTerm); // <== แสดงคำค้นหาที่ผู้ใช้กรอก
+      setIsSearching(true);
       const response = await fetch(`http://localhost:8080/api/search/${encodeURIComponent(searchTerm)}`);
-      
+
       if (!response.ok) {
         throw new Error('Search request failed');
       }
-      
+
       const searchResults = await response.json();
+      console.log("✅ Search results:", searchResults); // <== แสดงผลลัพธ์ที่ได้รับจาก backend
+
       setPosts(searchResults);
     } catch (error) {
       console.error("Search error:", error);
-      // Optionally show an error message to the user
     } finally {
       setIsSearching(false);
     }
   };
 
-  // Reset search when tag changes
-  useEffect(() => {
-    setPosts(initialPosts);
-    setSearchTerm("");
-  }, [currentSelectedTag, initialPosts]);
       
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
@@ -89,29 +94,29 @@ export default function HomeComponent({ posts: initialPosts }) {
       </div>
       
       {/* Search Bar */}
-      <div className="mb-6">
-        <form onSubmit={handleSearch} className="flex w-full max-w-lg">
-          <div className="relative flex-grow">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Search blogs..."
-            />
-          </div>
+      <form onSubmit={handleSearch} className="relative mb-6">
+        <div className="flex items-center border rounded-lg overflow-hidden shadow-sm">
+          <Input
+            type="text"
+            placeholder="Search blogs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full py-2 px-4 focus:outline-none"
+          />
           <Button 
             type="submit" 
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            variant="ghost" 
+            className="p-2"
             disabled={isSearching}
           >
-            {isSearching ? 'Searching...' : 'Search'}
+            {isSearching ? (
+              <div className="h-5 w-5 border-t-2 border-blue-500 rounded-full animate-spin"></div>
+            ) : (
+              <Search className="h-5 w-5" />
+            )}
           </Button>
-        </form>
-      </div>
+        </div>
+      </form>
       
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-8/12">
