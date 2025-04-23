@@ -197,14 +197,14 @@ exports.searchBlogs = async (req, res) => {
               ]
             }
           },
-          {
-            $project: {
-              title: 1,
-              content: 1,
-              company_name: 1,
-              tags: 1
-            }
-          }
+          // {
+          //   $project: {
+          //     title: 1,
+          //     content: 1,
+          //     company_name: 1,
+          //     tags: 1
+          //   }
+          // }
         ]);
         
         res.json(blogs);
