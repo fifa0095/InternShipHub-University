@@ -91,14 +91,25 @@ function CreateBlogForm({ user }) {
       });
 
       const result = await response.json();
+      console.log("API Response:", result); // ตรวจสอบค่าที่ได้จาก API
+      console.log("Response Status:", response.status); // ตรวจสอบสถานะการตอบกลับจาก API
 
-      if (result.success) {
-        toast({ title: "Success", description: result.success });
+      if (response.status === 201) {
+        toast({
+          title: "Success",
+          description: "Your blog has been successfully published! You can view it now.",
+          variant: "success",
+        });
         router.push("/");
       } else {
-        toast({ title: "Error", description: result.error, variant: "destructive" });
+        toast({
+          title: "Error",
+          description: result.error || "An unknown error occurred",
+          variant: "destructive",
+        });
       }
     } catch (e) {
+      console.error("Error occurred during submission:", e); // เพิ่มการ log ข้อผิดพลาด
       toast({ title: "Error", description: "Submission failed", variant: "destructive" });
     } finally {
       setIsLoading(false);
