@@ -132,7 +132,7 @@ export default function Header({ user }) {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Avatar className="h-8 w-8 cursor-pointer">
-                        <AvatarImage src={user.avatar || "default-avatar.jpg"} />
+                        <AvatarImage src={user.avatar } />
                         <AvatarFallback>Unknown</AvatarFallback>
                       </Avatar>
                     </DropdownMenuTrigger>

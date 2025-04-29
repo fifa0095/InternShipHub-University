@@ -56,6 +56,8 @@ function CreateBlogForm({ user }) {
     },
   });
 
+  const bannerLink = watch("banner_link");
+
   useEffect(() => {
     const subscription = watch((value, { name }) => {
       if (name === "company_name") {
@@ -91,8 +93,8 @@ function CreateBlogForm({ user }) {
       });
 
       const result = await response.json();
-      console.log("API Response:", result); // ตรวจสอบค่าที่ได้จาก API
-      console.log("Response Status:", response.status); // ตรวจสอบสถานะการตอบกลับจาก API
+      console.log("API Response:", result);
+      console.log("Response Status:", response.status);
 
       if (response.status === 201) {
         toast({
@@ -109,7 +111,7 @@ function CreateBlogForm({ user }) {
         });
       }
     } catch (e) {
-      console.error("Error occurred during submission:", e); // เพิ่มการ log ข้อผิดพลาด
+      console.error("Error occurred during submission:", e);
       toast({ title: "Error", description: "Submission failed", variant: "destructive" });
     } finally {
       setIsLoading(false);
@@ -142,7 +144,6 @@ function CreateBlogForm({ user }) {
 
       <main>
         <form>
-          {/* Type */}
           {user?.isPremium && (
             <Controller
               name="type"
@@ -162,7 +163,6 @@ function CreateBlogForm({ user }) {
             />
           )}
 
-          {/* Title */}
           <Controller
             name="title"
             control={control}
@@ -178,7 +178,6 @@ function CreateBlogForm({ user }) {
           />
           {errors.title && <p className="text-red-600 text-sm">{errors.title.message}</p>}
 
-          {/* Company */}
           <Controller
             name="company_name"
             control={control}
@@ -209,7 +208,6 @@ function CreateBlogForm({ user }) {
           )}
           {errors.company_name && <p className="text-red-600 text-sm">{errors.company_name.message}</p>}
 
-          {/* Tags */}
           <Controller
             name="tags"
             control={control}
@@ -228,7 +226,6 @@ function CreateBlogForm({ user }) {
           />
           {errors.tags && <p className="text-red-600 text-sm">{errors.tags.message}</p>}
 
-          {/* Source */}
           <Controller
             name="src_from"
             control={control}
@@ -243,8 +240,7 @@ function CreateBlogForm({ user }) {
             )}
           />
 
-          {/* Banner Upload */}
-          <div className="flex items-center mb-6">
+          <div className="flex flex-col items-start mb-6">
             <UploadButton
               endpoint="imageUploader"
               content={{
@@ -266,9 +262,18 @@ function CreateBlogForm({ user }) {
                 toast({ title: "Error", description: error.message, variant: "destructive" });
               }}
             />
+
+            {bannerLink && (
+              <div className="mt-4 w-full">
+                <img
+                  src={bannerLink}
+                  alt="Uploaded Banner"
+                  className="w-full max-h-[300px] object-cover rounded-lg border"
+                />
+              </div>
+            )}
           </div>
 
-          {/* Content */}
           <Controller
             name="content"
             control={control}
