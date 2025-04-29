@@ -121,68 +121,86 @@ export default function HomeComponent({ posts: initialPosts }) {
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-8/12">
           <div className={`${isGridView ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-6"}`}>
-            {filteredPosts.length > 0 ? (
-              filteredPosts.map((postItem) => (
-                <article
-                  onClick={() => router.push(`/blog/${postItem._id}`)}
-                  key={postItem._id}
-                  className={`cursor-pointer ${
-                    isGridView ? "flex flex-col" : "flex gap-6"
-                  } bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden`}
-                >
-                  <div className={`flex-1 p-4 ${isGridView ? "" : "w-2/3"}`}>
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage
-                          src={
-                            postItem?.type === "auto_news"
-                              ? "https://i.pinimg.com/736x/f1/7d/db/f17ddb244e3f2f6a720e61cd3f8161fb.jpg"
-                              : "https://i.pinimg.com/736x/50/f2/91/50f2915c4f23c9643efb1c8f05020f2b.jpg"
-                          }
-                          alt={postItem?.author || "Author"}
-                        />
-                        <AvatarFallback>
-                          {postItem?.author ? postItem.author[0] : "A"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-[16px] font-medium text-gray-700">
-                        {postItem?.author || "Unknown Author"}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold mb-2 text-gray-800 line-clamp-2">
-                      {postItem?.title}
-                    </h3>
-                    <div>
-                      <span>{new Date(postItem?.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    {postItem.tags && Object.keys(postItem.tags).length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {Object.keys(postItem.tags).map((category, index) => (
-                          <span key={index} className="text-xs bg-gray-200 px-2 py-1 rounded-full">
-                            {category}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  {postItem.banner_link && (
-                    <div className={`${isGridView ? "w-full h-48" : "w-1/3 h-full"} relative`}>
-                      <img
-                        src={postItem.banner_link}
-                        alt={postItem?.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => (e.target.style.display = "none")}
-                      />
-                    </div>
-                  )}
-                </article>
-              ))
-            ) : (
-              <div className="text-center py-8">
-                <h2 className="font-bold text-2xl mb-2">No Blogs Found!</h2>
-                <p className="text-gray-600">Try adjusting your search or filter criteria</p>
-              </div>
-            )}
+          {filteredPosts.length > 0 ? (
+  filteredPosts.map((postItem, index) => (
+    <article
+      onClick={() => router.push(`/blog/${postItem._id}`)}
+      key={`${postItem._id}-${index}`}
+      className={`cursor-pointer ${
+        isGridView ? "flex flex-col" : "flex gap-6"
+      } bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden`}
+    >
+      <div className={`flex-1 p-4 ${isGridView ? "" : "w-2/3"}`}>
+        <div className="flex items-center space-x-2 mb-2">
+          <Avatar className="h-6 w-6">
+            <AvatarImage
+              src={
+                postItem?.type === "auto_news"
+                  ? "https://i.pinimg.com/736x/f1/7d/db/f17ddb244e3f2f6a720e61cd3f8161fb.jpg"
+                  : "https://i.pinimg.com/736x/50/f2/91/50f2915c4f23c9643efb1c8f05020f2b.jpg"
+              }
+              alt={postItem?.author || "Author"}
+            />
+            <AvatarFallback>
+              {postItem?.author ? postItem.author[0] : "A"}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-[16px] font-medium text-gray-700">
+            {postItem?.author || "Unknown Author"}
+          </span>
+        </div>
+
+        {/* ✅ แสดงชื่อบริษัทเด่นสุด */}
+        {postItem.company_name && (
+          <h3 className="text-xl font-bold text-blue-700 mb-1 line-clamp-1">
+            {postItem.company_name}
+          </h3>
+        )}
+
+        {/* ✅ ตามด้วย title */}
+        <h4 className="text-lg font-semibold mb-2 text-gray-800 line-clamp-2">
+          {postItem?.title}
+        </h4>
+
+        <div>
+          <span>{new Date(postItem?.createdAt).toLocaleDateString()}</span>
+        </div>
+
+        {postItem.tags && Object.keys(postItem.tags).length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {Object.keys(postItem.tags).map((category, index) => (
+              <span key={index} className="text-xs bg-gray-200 px-2 py-1 rounded-full">
+                {category}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ✅ จำกัดขนาดรูปให้เท่ากัน */}
+      {postItem.banner_link && (
+        <div
+          className={`${
+            isGridView ? "w-full h-48" : "w-1/3 h-48"
+          } relative flex-shrink-0`}
+        >
+          <img
+            src={postItem.banner_link}
+            alt={postItem?.title}
+            className="w-full h-full object-cover"
+            onError={(e) => (e.target.style.display = "none")}
+          />
+        </div>
+      )}
+    </article>
+  ))
+) : (
+  <div className="text-center py-8">
+    <h2 className="font-bold text-2xl mb-2">No Blogs Found!</h2>
+    <p className="text-gray-600">Try adjusting your search or filter criteria</p>
+  </div>
+)}
+
           </div>
         </div>
         <div className="w-full lg:w-4/12">
