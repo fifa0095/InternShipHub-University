@@ -128,10 +128,13 @@ export default function Page() {
                     <p className="text-gray-600 line-clamp-3">{blog.description}</p>
                     <a
                       href={`/blog/${blog._id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-sm text-blue-500 underline mt-2 inline-block"
                     >
                       Read more →
                     </a>
+
                   </div>
                 ))}
               </div>
@@ -176,7 +179,7 @@ export default function Page() {
               placeholder="e.g., JavaScript, Python"
             />
 
-            <label className="block mb-2 font-medium">Educational *</label>
+            <label className="block mb-2 font-medium">Certificate *</label>
             <input
               type="text"
               name="educational"
