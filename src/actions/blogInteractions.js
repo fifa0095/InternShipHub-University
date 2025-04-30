@@ -13,78 +13,46 @@ const commentSchema = z.object({
   postId: z.string().min(1, "Post Id is required"),
 });
 
-export async function addCommentAction(data) {
-  const token = (await cookies()).get("token")?.value;
-  const user = await verifyAuth(token);
-
-  if (!user) {
-    return {
-      error: "Unauth user",
-      status: 401,
-    };
-  }
-  const validateFields = commentSchema.safeParse(data);
-
-  if (!validateFields.success) {
-    return {
-      error: validateFields.error.errors[0].message,
-    };
-  }
-
-  const { postId, content } = validateFields.data;
-
+export async function addCommentAction({ postId, content }) {
   try {
-    const req = await request();
-    const decision = await commentRules.protect(req, { requested: 1 });
-
-    if (decision.isDenied()) {
-      console.log(decision, "decision", decision.isDenied());
-
-      if (decision.reason.isRateLimit()) {
-        return {
-          error: "Rate limit excedeed! Please try after some time",
-          status: 429,
-        };
-      }
-
-      if (decision.reason.isBot()) {
-        return {
-          error: "Bot activity detected",
-        };
-      }
-      return {
-        error: "Request denied",
-        status: 403,
-      };
+    // เช็คว่า content ต้องเป็น Array
+    if (!Array.isArray(content)) {
+      content = [content]; // แปลงเป็น Array ถ้าไม่ใช่
     }
 
-    await connectToDatabase();
-    const post = await BlogPost.findById(postId);
-    if (!post) {
-      return {
-        error: "Blog post not found",
-      };
-    }
-
-    if (!post.comments) {
-      post.comments = [];
-    }
-
-    post.comments.push({
-      content,
-      author: user.userId,
-      authorName: user.userName,
+    const res = await fetch("http://localhost:8080/api/comments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // แนบ token ถ้าต้องการ
+        // "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        blog_id: postId,
+        content,  // content เป็น Array
+        // uid ควรจะดึงจาก token หรือ session ของผู้ใช้
+        uid: "userIdFromToken", // สมมุติว่า uid ได้จากการยืนยันตัวตนของผู้ใช้
+      }),
     });
-    await post.save();
-    revalidatePath(`/blog/${postId}`);
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return {
+        error: data?.message || "Failed to add comment",
+        status: res.status,
+      };
+    }
 
     return {
       success: true,
       message: "Comment added successfully",
+      data,
     };
-  } catch (e) {
+  } catch (err) {
+    console.error("Error adding comment:", err);
     return {
-      error: "Some error occured!",
+      error: "Network error or server not responding",
     };
   }
 }
