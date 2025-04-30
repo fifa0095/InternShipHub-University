@@ -1,6 +1,6 @@
-const ml_path = "http://localhost:5001";
+// const ml_path = "http://localhost:5001";
+const ml_path = "https://compath-ml.vercel.app/";
 const User = require('../models/User');
-
 
 exports.predictJob = async (req, res) => {
     try {

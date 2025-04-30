@@ -63,7 +63,7 @@ exports.getReview = async (req, res) => {
 exports.editBlog = async (req, res) => {
     try {
         const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.json(blog);
+        res.status(200).json(blog);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
