@@ -1,4 +1,5 @@
 "use client"; 
+import PredictList from "./PredictList";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -168,7 +169,7 @@ export default function ResumePrediction({ user }) {
         <h2 className="text-5xl font-bold text-gray-800 flex items-center gap-2">
           <span className="text-blue-600">🔮</span> Resume Prediction
         </h2>
-        <p className="text-gray-600 mt-2">👤 Logged in as: {user?.userId || "Unknown"}</p>
+        {/* <p className="text-gray-600 mt-2">👤 Logged in as: {user?.userId || "Unknown"}</p> */}
       </header>
 
       <form
@@ -245,6 +246,7 @@ export default function ResumePrediction({ user }) {
           </button>
         </div>
       </form>
+      <PredictList uid={user?.userId} />
     </div>
   );
 }

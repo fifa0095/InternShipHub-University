@@ -1,5 +1,5 @@
 import ResumePrediction from "@/components/prediction/Prediction";
-import PredictList from "@/components/prediction/PredictList";
+
 import { cookies } from "next/headers";
 import { verifyAuth } from "@/lib/auth";
 
@@ -13,7 +13,6 @@ export default async function ResumePredictionPage() {
   return (
     <>
       <ResumePrediction user={user} />
-      <PredictList uid={user?.userId} />
     </>
   );
 }
