@@ -13,6 +13,7 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [blogs, setBlogs] = useState([]);
+  const [pdfText, setPdfText] = useState(""); // <== เพิ่ม state เก็บข้อความจาก PDF
 
   const onChangeHandler = (e) => {
     const { name, value, files } = e.target;
@@ -23,6 +24,41 @@ export default function Page() {
     }
   };
 
+  const handleReadPdf = async () => {
+    if (!form.file) {
+      toast.warning("Please upload a PDF file first.");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append("file", form.file);
+  
+    try {
+      const response = await fetch("http://localhost:8080/api/pdfReader", {
+        method: "POST",
+        body: formData,
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to read PDF");
+      }
+  
+      // อัปเดต form state ด้วยข้อมูลที่อ่านได้จาก PDF
+      setForm((prev) => ({
+        ...prev,
+        skill: data.skill || "",
+        educational: data.educational || "",
+      }));
+  
+      toast.success("✅ Extracted info from PDF!");
+    } catch (error) {
+      console.error("❌ PDF Read Error:", error);
+      toast.error("Failed to read PDF");
+    }
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -39,7 +75,6 @@ export default function Page() {
     }
 
     try {
-      // Predict text first
       const response = await fetch("http://localhost:8080/api/predict", {
         method: "POST",
         headers: {
@@ -54,7 +89,6 @@ export default function Page() {
         throw new Error(predictionResult.error || "Prediction failed");
       }
 
-      // Upload file if exists
       if (form.file) {
         const fileResponse = await fetch("http://localhost:8080/api/upload", {
           method: "POST",
@@ -69,13 +103,13 @@ export default function Page() {
       setResult(predictionResult);
       toast.success("✅ Prediction sent successfully!");
 
-      // Get blogs by prediction result
-      const predictionText = predictionResult.prediction || predictionResult.result || predictionResult; // fallback
+      const predictionText =
+        predictionResult.prediction || predictionResult.result || predictionResult;
+
       const blogRes = await fetch(
         `http://localhost:8080/api/search/${encodeURIComponent(predictionText)}`
       );
       const blogData = await blogRes.json();
-      console.log("🔍 Blog search result:", blogData); // ← log ตรงนี้
       setBlogs(blogData || []);
     } catch (error) {
       console.error("❌ Fetch Error:", error);
@@ -134,7 +168,6 @@ export default function Page() {
                     >
                       Read more →
                     </a>
-
                   </div>
                 ))}
               </div>
@@ -165,6 +198,13 @@ export default function Page() {
               onChange={onChangeHandler}
               className="mb-4 w-[80%] border px-3 py-2"
             />
+            <button
+              type="button"
+              onClick={handleReadPdf}
+              className="bg-green-600 text-white py-1 px-4 rounded-md hover:bg-green-700 mt-2"
+            >
+              Read PDF Text
+            </button>
           </div>
 
           <div className="md:w-1/2 pl-0 md:pl-6">
@@ -201,6 +241,13 @@ export default function Page() {
             />
           </div>
         </div>
+
+        {pdfText && (
+          <div className="mt-6 bg-gray-50 p-4 border border-gray-300 rounded-md">
+            <h4 className="font-semibold text-gray-700 mb-2">📄 Extracted PDF Text:</h4>
+            <p className="whitespace-pre-wrap text-gray-800 text-sm">{pdfText}</p>
+          </div>
+        )}
 
         <div className="flex justify-end mt-6">
           <button
