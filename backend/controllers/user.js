@@ -42,6 +42,7 @@ exports.register = async (req, res) => {
             name,
             email: email.toLowerCase(),
             password: hashedPassword,
+            type: "user",
         });
 
         await newUser.save();

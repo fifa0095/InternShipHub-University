@@ -28,9 +28,9 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  isPremium: {
-    type: Boolean,
-    default: true,
+  type: {
+    type: String,
+    required: true,
   },
   resume: [ResumeSchema],
 });
