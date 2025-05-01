@@ -1,4 +1,5 @@
 const Blog = require('../models/Blog');
+const User = require('../models/User');
 
 exports.createBlog = async (req, res) => {
     try {
@@ -20,16 +21,36 @@ exports.createBlog = async (req, res) => {
 };
 
 exports.getAllBlog = async (req, res) => {
-    try {
-        const blog = await Blog.find({ 
-            type: { $in: ["auto_news", "user_blogs"] }
-        });
-        res.status(200).json(blog);
-    } catch (error) {
-    res.status(500).json({ message: error.message });
-    }
+  try {
+    const blogs = await Blog.find({
+      type: { $in: ["auto_news", "user_blogs"] }
+    }).lean(); // use .lean() for better performance if no Mongoose methods needed
 
+    // Collect all unique author IDs
+    const authorIds = [...new Set(blogs.map(blog => blog.author))];
+
+    // Fetch all authors in one query
+    const users = await User.find({ _id: { $in: authorIds } }).lean();
+
+    // Map user ID to user name
+    const userMap = {};
+    users.forEach(user => {
+      userMap[user._id.toString()] = user.name;
+    });
+
+    // Replace author ID with author name
+    const blogsWithAuthorName = blogs.map(blog => ({
+      ...blog,
+      author_uid: blog.author, // keep original ID as author_uid
+      author: userMap[blog.author.toString()] || "Unknown"
+    }));
+
+    res.status(200).json(blogsWithAuthorName);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
+
 
 exports.getBlogByPage = async (req, res) => {
     try {
@@ -47,6 +68,31 @@ exports.getBlogByPage = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
+
+exports.getBlogByUid = async (req, res) => {
+    try {
+      const blogs = await Blog.find({ author: req.params.uid }).lean();
+  
+      if (blogs.length === 0) {
+        return res.status(404).json({ error: 'blog not found' });
+      }
+  
+      const user = await User.findById(req.params.uid).lean();
+      const authorName = user ? user.name : "Unknown";
+  
+      const blogsWithAuthor = blogs.map(blog => ({
+        ...blog,
+        author_uid: blog.author,
+        author: authorName
+      }));
+  
+      res.status(200).json(blogsWithAuthor);
+    } catch (error) {
+      console.error("Error Fetching Blog:", error.message);
+      res.status(400).json({ error: error.message });
+    }
+  };
+  
 
 exports.getReview = async (req, res) => {
     try {
@@ -72,7 +118,11 @@ exports.editBlog = async (req, res) => {
 
 exports.deleteBlog = async (req, res) => {
     try {
-        await Blog.findByIdAndDelete(req.params.id);
+        const blog = await Blog.findByIdAndDelete(req.params.id);
+        if(!blog){
+          return res.status(404).json({ error: 'blog not found' });
+        }
+
         res.json({ message: "Blog deleted" });
     } catch (error) {
         res.status(500).json({ error: error.message });

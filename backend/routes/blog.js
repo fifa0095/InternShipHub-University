@@ -1,21 +1,23 @@
 const express = require('express')
 const router = express.Router()
 
-const {createBlog , getAllBlog  , deleteBlog , editBlog , searchBlogs , getReview, getBlogByPage} = require('../controllers/blog')
+const BlogController = require('../controllers/blog')
 
 // call at  http://localhost:8080/api/create (sned ONLY JSON with POST method)
-router.post('/createBlog', createBlog)
+router.post('/createBlog', BlogController.createBlog)
 
-router.get('/getAllBlog', getAllBlog)
+router.get('/getAllBlog', BlogController.getAllBlog)
 
-router.get('/getBlog/:page', getBlogByPage)
+router.get('/getBlog/:page', BlogController.getBlogByPage)
 
-router.get('/getReview', getReview)
+router.get('/getBlogByUid/:uid', BlogController.getBlogByUid)
 
-router.put('/updateBlog', editBlog)
+router.get('/getReview', BlogController.getReview)
 
-router.delete('/deleteBlog', deleteBlog)
+router.put('/updateBlog', BlogController.editBlog)
 
-router.get('/search/:keyword', searchBlogs)
+router.delete('/deleteBlog/:id', BlogController.deleteBlog)
+
+router.get('/search/:keyword', BlogController.searchBlogs)
 
 module.exports = router
