@@ -171,7 +171,7 @@ export default function ResumePrediction({ user }) {
         className="max-w-6xl mx-auto p-6 mt-6 bg-white shadow-md rounded-lg"
       >
         <div className="flex flex-col md:flex-row">
-          <div className="md:w-1/2 pr-0 md:pr-6 md:border-r border-gray-300 mb-6 md:mb-0 flex flex-col items-center">
+          <div className="md:w-1/2 pr-0 md:pr-6 md:border-r border-gray-300 mb-6 md:mb-0 flex flex-col items-center justify-center">
             <label className="block mb-2 font-medium flex items-center gap-1">
               Upload PDF (Optional)
               <span className="relative group cursor-pointer text-blue-500">
@@ -197,7 +197,11 @@ export default function ResumePrediction({ user }) {
             </button>
           </div>
 
+
           <div className="md:w-1/2 pl-0 md:pl-6">
+          <h2 className="text-2xl font-bold mt-8">Fill in Your Information for Career Prediction</h2>
+          <p className="text-l font-semibold mb-4 text-gray-400 ">Please enter your details so the system can suggest the most suitable career for you.</p>
+
             {/* Skill */}
             <label className="block mb-2 font-medium flex items-center gap-1">
               Skill *
