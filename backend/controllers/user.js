@@ -79,7 +79,7 @@ exports.login = async (req, res) => {
             userId: user._id.toString(),
             email: user.email,
             userName: user.name,
-            isPremium: user.isPremium,
+            type: user.type,
         })
             .setProtectedHeader({ alg: "HS256" })
             .setIssuedAt()
@@ -185,7 +185,7 @@ exports.editUser = async (req, res) => {
         userId: updatedUser._id.toString(),
         email: updatedUser.email,
         userName: updatedUser.name,
-        isPremium: updatedUser.isPremium,
+        type: updatedUser.type,
       })
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
