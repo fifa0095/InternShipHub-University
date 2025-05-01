@@ -87,7 +87,7 @@ export default function Header({ user }) {
   const handleEditProfileSubmit = async (data) => {
     try {
       // Call API to update the user's profile information (data contains new values)
-      console.log(data); // You can send this data to an API to update user profile
+      // console.log(data); // You can send this data to an API to update user profile
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
@@ -139,6 +139,11 @@ export default function Header({ user }) {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
                       <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => router.push(`/blog/user/${user._id}`)}>
+                      <Search className="h-4 w-4" />
+                      <span>My Blogs</span>
+                      </DropdownMenuItem>
+
                       <DropdownMenuItem onClick={() => setIsEditProfileOpen(true)}>
                         <Edit className="h-4 w-4" />
                         <span>Edit Profile</span>

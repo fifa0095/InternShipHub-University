@@ -77,6 +77,16 @@ const Sidebar = () => {
             <DatabaseIcon className="w-5 h-5" />
             <span className="ml-3">Data Virtual</span>
           </Link>
+
+          <Link
+            href="/myBlog"
+            className={`flex items-center px-5 py-3 rounded-r-full transition ${
+              pathname === "/myBlog" ? "bg-black text-white" : "hover:bg-gray-100"
+            }`}
+          >
+            <DatabaseIcon className="w-5 h-5" />
+            <span className="ml-3">My Blogs</span>
+          </Link>
         </nav>
       </div>
     </div>
