@@ -162,7 +162,7 @@ exports.editUser = async (req, res) => {
         }
   
  
-        const isMatch = await bcrypt.compare(oldPassword, userWithPassword.password);
+        const isMatch = await bcrypt.compare(old_password, newPassword);
         if (!isMatch) {
           return res.status(400).json({ error: 'Old password is incorrect' });
         }
