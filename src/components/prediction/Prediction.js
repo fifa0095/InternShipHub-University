@@ -62,17 +62,12 @@ export default function ResumePrediction({ user }) {
     e.preventDefault();
     setLoading(true);
 
-    // สร้างข้อมูล JSON สำหรับส่ง โดยเพิ่ม uid หากมี user._id
     const jsonData = {
-      uid: user?.userId,  // เพิ่ม uid ที่นี่
+      uid: user?.userId,
       skill: form.skill,
       educational: form.educational,
       experience: form.experience,
     };
-
-    // Log ข้อมูล user และ jsonData ที่จะส่งไป
-    console.log("User:", user);
-    console.log("Data sent to predict:", jsonData);
 
     try {
       const response = await fetch("http://localhost:8080/api/predict", {
@@ -80,7 +75,7 @@ export default function ResumePrediction({ user }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(jsonData), // ส่ง jsonData ที่มี uid
+        body: JSON.stringify(jsonData), 
       });
 
       const predictionResult = await response.json();
@@ -153,7 +148,7 @@ export default function ResumePrediction({ user }) {
                       rel="noopener noreferrer"
                       className="text-sm text-blue-500 underline mt-2 inline-block"
                     >
-                      Read more →
+                      Read more → 
                     </a>
                   </div>
                 ))}
@@ -169,7 +164,6 @@ export default function ResumePrediction({ user }) {
         <h2 className="text-5xl font-bold text-gray-800 flex items-center gap-2">
           <span className="text-blue-600">🔮</span> Resume Prediction
         </h2>
-        {/* <p className="text-gray-600 mt-2">👤 Logged in as: {user?.userId || "Unknown"}</p> */}
       </header>
 
       <form
@@ -178,7 +172,15 @@ export default function ResumePrediction({ user }) {
       >
         <div className="flex flex-col md:flex-row">
           <div className="md:w-1/2 pr-0 md:pr-6 md:border-r border-gray-300 mb-6 md:mb-0 flex flex-col items-center">
-            <label className="block mb-2 font-medium">Upload PDF (Optional)</label>
+            <label className="block mb-2 font-medium flex items-center gap-1">
+              Upload PDF (Optional)
+              <span className="relative group cursor-pointer text-blue-500">
+                📄
+                <div className="absolute bottom-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                  อัปโหลดไฟล์ PDF ที่มีข้อมูลเกี่ยวกับทักษะหรือการศึกษา เพื่อให้ระบบดึงข้อมูลอัตโนมัติ
+                </div>
+              </span>
+            </label>
             <input
               type="file"
               name="file"
@@ -189,14 +191,23 @@ export default function ResumePrediction({ user }) {
             <button
               type="button"
               onClick={handleReadPdf}
-              className="bg-green-600 text-white py-1 px-4 rounded-md hover:bg-green-700 mt-2"
+              className="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 mt-2"
             >
               Read PDF Text
             </button>
           </div>
 
           <div className="md:w-1/2 pl-0 md:pl-6">
-            <label className="block mb-2 font-medium">Skill *</label>
+            {/* Skill */}
+            <label className="block mb-2 font-medium flex items-center gap-1">
+              Skill *
+              <span className="relative group cursor-pointer text-blue-500">
+                ℹ️
+                <div className="absolute bottom-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                  ระบุทักษะที่คุณมี เช่น JavaScript, Python, Excel ฯลฯ
+                </div>
+              </span>
+            </label>
             <input
               type="text"
               name="skill"
@@ -207,7 +218,16 @@ export default function ResumePrediction({ user }) {
               placeholder="e.g., JavaScript, Python"
             />
 
-            <label className="block mb-2 font-medium">Certificate *</label>
+            {/* Certificate */}
+            <label className="block mb-2 font-medium flex items-center gap-1">
+              Certificate *
+              <span className="relative group cursor-pointer text-blue-500">
+                ℹ️
+                <div className="absolute bottom-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                  ใส่ระดับการศึกษา หรือใบรับรอง เช่น ปริญญาตรี สาขา IT หรือ Google Certificate
+                </div>
+              </span>
+            </label>
             <input
               type="text"
               name="educational"
@@ -218,7 +238,16 @@ export default function ResumePrediction({ user }) {
               placeholder="e.g., Bachelor's in Computer Science"
             />
 
-            <label className="block mb-2 font-medium">Experience *</label>
+            {/* Experience */}
+            <label className="block mb-2 font-medium flex items-center gap-1">
+              Experience *
+              <span className="relative group cursor-pointer text-blue-500">
+                ℹ️
+                <div className="absolute bottom-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                  เขียนประสบการณ์การทำงาน หรือโปรเจกต์ที่เคยทำ เช่น สร้างเว็บ React
+                </div>
+              </span>
+            </label>
             <textarea
               name="experience"
               value={form.experience}
