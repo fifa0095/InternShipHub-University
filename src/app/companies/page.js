@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 export default async function CompaniesPage() {
   try {
-    const response = await fetch("http://localhost:8080/api/getAllBlog");
+    const response = await fetch("http://localhost:8080/api/getReview");
 
     if (!response.ok) {
       throw new Error("Failed to fetch blog data");
@@ -17,12 +17,12 @@ export default async function CompaniesPage() {
       throw new Error("Invalid blog data format");
     }
 
-    // กรองเฉพาะบล็อกที่มีหมวดหมู่ 'company'
-    const companyBlogs = posts.filter((post) =>
-      Array.isArray(post.tags) ? post.tags.includes("company") : post.tags === "company"
+    // ไม่ต้องกรอง filter ใด ๆ แล้ว
+    return (
+      <div className="bg-gray-100 min-h-screen py-10 px-4">
+        <CompanyBlogsComponent posts={posts} />
+      </div>
     );
-
-    return <CompanyBlogsComponent posts={companyBlogs} />;
   } catch (error) {
     console.error("Error fetching company blogs:", error);
     return notFound(); // หากโหลดข้อมูลไม่ได้ ให้ไปหน้า 404
