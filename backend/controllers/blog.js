@@ -95,15 +95,30 @@ exports.getBlogByUid = async (req, res) => {
   
 exports.getReview = async (req, res) => {
     try {
-        const blog = await Blog.find({ 
-            type: "company_reviews" 
-        });
-        res.status(200).json(blog);
+      const blogs = await Blog.find({ 
+        type: "company_reviews" 
+      }).lean();
+  
+      const authorIds = [...new Set(blogs.map(blog => blog.author))];
+  
+      const users = await User.find({ _id: { $in: authorIds } }).lean();
+      const userMap = {};
+      users.forEach(user => {
+        userMap[user._id.toString()] = user.name;
+      });
+  
+      const blogsWithAuthorName = blogs.map(blog => ({
+        ...blog,
+        author_uid: blog.author,
+        author: userMap[blog.author.toString()] || "Unknown"
+      }));
+  
+      res.status(200).json(blogsWithAuthorName);
     } catch (error) {
-    res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
-
-};
+  };
+  
 
 exports.editBlog = async (req, res) => {
     try {
