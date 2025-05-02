@@ -14,6 +14,7 @@ import Select from "react-select";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BLOG_CATEGORIES, COMPANY_LIST } from "@/lib/config";
+import DeleteBlog from "./DeleteBlog";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 import "react-quill-new/dist/quill.snow.css";
@@ -22,7 +23,7 @@ import "./quill-custom.css";
 const blogSchema = z.object({
   title: z.string().min(1),
   company_name: z.string().min(1),
-  content: z.array(z.string()).min(1),
+  content: z.string().min(1), // ใช้เป็น string (HTML)
   tags: z.array(z.string()).min(1),
   src_from: z.string().optional(),
   banner_link: z.string().optional(),
@@ -30,12 +31,8 @@ const blogSchema = z.object({
 });
 
 export default function EditBlogForm({ blog, user }) {
-  const [isOtherCompany, setIsOtherCompany] = useState(blog.company_name === "other");
-  const [otherCompanyName, setOtherCompanyName] = useState(
-    blog.company_name !== "other" && !COMPANY_LIST.find(c => c.key === blog.company_name) 
-      ? blog.company_name 
-      : ""
-  );
+  const [isOtherCompany, setIsOtherCompany] = useState(false);
+  const [otherCompanyName, setOtherCompanyName] = useState("");
   const router = useRouter();
   const quillRef = useRef(null);
   const { toast } = useToast();
@@ -53,46 +50,61 @@ export default function EditBlogForm({ blog, user }) {
       company_name: COMPANY_LIST.find(c => c.key === blog.company_name)
         ? blog.company_name
         : "other",
-      content: blog.content || [],
+      content: Array.isArray(blog.content) ? blog.content.join("\n") : blog.content || "",
       tags: blog.tags ? Object.keys(blog.tags) : [],
       src_from: blog.src_from || "",
       banner_link: blog.banner_link || "",
-      type: blog.type || "Blog",
+      type: blog.type || "user_blogs",
     },
   });
 
   const bannerLink = watch("banner_link");
 
+  // Watch for company_name changes
   useEffect(() => {
-    const sub = watch((value, { name }) => {
-      if (name === "company_name") {
-        setIsOtherCompany(value.company_name === "other");
-      }
-    });
-    return () => sub.unsubscribe();
-  }, [watch]);
+    const company = watch("company_name");
+    setIsOtherCompany(company === "other");
+
+    if (
+      company === "other" &&
+      blog.company_name !== "other" &&
+      !COMPANY_LIST.find(c => c.key === blog.company_name)
+    ) {
+      setOtherCompanyName(blog.company_name);
+    }
+  }, [watch("company_name")]);
 
   const onSubmit = async (data) => {
     const company = data.company_name === "other" ? otherCompanyName : data.company_name;
     const tagsObj = {};
     data.tags.forEach((tag) => (tagsObj[tag] = []));
 
+    const updatedData = {
+      ...data,
+      _id: blog._id,
+      author: blog.author,
+      uid: user?.uid,
+      createdAt: blog.createdAt,
+      updatedAt: new Date().toISOString(),
+      __v: blog.__v,
+      company_name: company,
+      tags: tagsObj,
+    };
+
+    console.log("✏️ Updating blog with:", updatedData);
+
     try {
-      const res = await fetch(`http://localhost:8080/api/updateBlog/${blog._id}`, {
+      const res = await fetch("http://localhost:8080/api/updateBlog", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          company_name: company,
-          tags: tagsObj,
-        }),
+        body: JSON.stringify(updatedData),
       });
 
       const result = await res.json();
 
-      if (res.ok) {
+      if (res.status === 200) {
         toast({ title: "Updated", description: "Blog updated successfully", variant: "success" });
-        router.push(`/blogs/${blog._id}`);
+        router.push(`/blog/${blog._id}`);
       } else {
         toast({ title: "Failed", description: result.error || "Error", variant: "destructive" });
       }
@@ -112,9 +124,18 @@ export default function EditBlogForm({ blog, user }) {
           </Avatar>
           <p className="font-semibold">{user?.userName}</p>
         </div>
-        <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
-          Save Changes
-        </Button>
+        <div className="flex gap-4">
+          <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save Changes"}
+          </Button>
+          <DeleteBlog
+            blogId={blog._id}
+            onDelete={() => {
+              toast({ title: "Deleted", description: "Blog deleted", variant: "success" });
+              router.push("/myBlog");
+            }}
+          />
+        </div>
       </header>
 
       <form>
@@ -128,7 +149,11 @@ export default function EditBlogForm({ blog, user }) {
                   { value: "user_blogs", label: "Blog" },
                   { value: "company_reviews", label: "Company Reviews" },
                 ]}
-                value={{ value: field.value, label: field.value }}
+                value={{
+                  value: field.value,
+                  label:
+                    field.value === "company_reviews" ? "Company Reviews" : "Blog",
+                }}
                 onChange={(opt) => field.onChange(opt?.value)}
                 className="mb-4"
               />
@@ -153,7 +178,11 @@ export default function EditBlogForm({ blog, user }) {
                 ...COMPANY_LIST.map(c => ({ value: c.key, label: c.value })),
                 { value: "other", label: "Other" },
               ]}
-              value={{ value: field.value, label: field.value }}
+              value={{
+                value: field.value,
+                label:
+                  COMPANY_LIST.find(c => c.key === field.value)?.value || "Other",
+              }}
               onChange={(opt) => field.onChange(opt?.value)}
               className="mb-2"
             />
@@ -212,7 +241,9 @@ export default function EditBlogForm({ blog, user }) {
                 toast({ title: "Image Uploaded" });
               }
             }}
-            onUploadError={(err) => toast({ title: "Upload Failed", description: err.message })}
+            onUploadError={(err) =>
+              toast({ title: "Upload Failed", description: err.message })
+            }
           />
           {bannerLink && (
             <img
@@ -229,10 +260,8 @@ export default function EditBlogForm({ blog, user }) {
           render={({ field }) => (
             <ReactQuill
               ref={quillRef}
-              value={field.value.join("\n")}
-              onChange={(val) =>
-                field.onChange(val.split("\n").filter((line) => line.trim() !== ""))
-              }
+              value={field.value}
+              onChange={(val) => field.onChange(val)}
               placeholder="Write something..."
               className="quill-editor"
             />
