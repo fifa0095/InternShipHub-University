@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import PredictLog from "./PredictLog";
 import PredictList from "./PredictList";
 import { jobInfo } from "@/Assets/assets";
+import JobInfoCard from "./JobInfo";
 
 export default function ResumePrediction({ user }) {
   const [form, setForm] = useState({
@@ -14,7 +16,6 @@ export default function ResumePrediction({ user }) {
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
-  const [blogs, setBlogs] = useState([]);
   const [pdfText, setPdfText] = useState("");
 
   const onChangeHandler = (e) => {
@@ -77,16 +78,11 @@ export default function ResumePrediction({ user }) {
       });
 
       const predictionResult = await response.json();
+
       if (!response.ok) throw new Error(predictionResult.error || "Prediction failed");
 
       setResult(predictionResult);
       toast.success("✅ Prediction sent successfully!");
-
-      const predictionText = predictionResult.prediction || predictionResult.result || predictionResult;
-
-      const blogRes = await fetch(`http://localhost:8080/api/search/${encodeURIComponent(predictionText)}`);
-      const blogData = await blogRes.json();
-      setBlogs(blogData || []);
     } catch (error) {
       console.error("❌ Fetch Error:", error);
       toast.error("An error occurred. Please try again.");
@@ -97,8 +93,24 @@ export default function ResumePrediction({ user }) {
 
   const closeModal = () => {
     setResult(null);
-    setBlogs([]);
   };
+
+  const mapPredictionToKey = (prediction) => {
+    if (!prediction) return null;
+
+    const mapping = {
+      "QA & Tester": "Tester",
+      "Cloud Management": "Cloud",
+      "Data & AI": "Data",
+      "Designer": "Designer",
+      "Developer": "Developer",
+      "Security": "Security",
+    };
+
+    return mapping[prediction] || prediction;
+  };
+
+  const covertResult = mapPredictionToKey(result?.prediction || result);
 
   return (
     <div className="py-10 bg-gray-100 relative">
@@ -109,64 +121,35 @@ export default function ResumePrediction({ user }) {
       )}
 
       {result && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-5xl w-full relative overflow-y-auto max-h-[80vh]">
-            <button
-              onClick={closeModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-black"
-            >
-              ✖
-            </button>
+          <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
+            <div className="bg-white p-8 rounded-lg shadow-lg max-w-5xl w-full relative overflow-hidden max-h-[90vh]">
+              <button
+                onClick={closeModal}
+                className="absolute top-2 right-2 text-gray-500 hover:text-black"
+              >
+                ✖
+              </button>
 
-            {/* ✅ แสดงผลลัพธ์พร้อม asset */}
-            {typeof result !== "string" && result?.prediction && jobInfo[result.prediction] ? (
-              <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
-                <img
-                  src={jobInfo[result.prediction].image.src}
-                  alt={result.prediction}
-                  className="w-24 h-24 object-contain"
-                />
-                <div>
-                  <h2 className="text-3xl font-bold text-gray-800">
-                    Prediction Result: {result.prediction}
-                  </h2>
-                  <p className="text-gray-600 mt-2">
-                    {jobInfo[result.prediction].description}
-                  </p>
+              <div className="flex flex-col md:flex-row gap-8 h-[75vh] overflow-hidden">
+                {/* Left: Job Info Sticky */}
+                <div className="flex-1 flex flex-col items-center text-center sticky top-0 self-start">
+                  {covertResult && jobInfo[covertResult] ? (
+                    <JobInfoCard job={jobInfo[covertResult]} />
+                  ) : (
+                    <h2 className="text-2xl font-bold text-gray-800">
+                      Prediction: {typeof result === "string" ? result : result?.prediction || "N/A"}
+                    </h2>
+                  )}
+                </div>
+
+                {/* Right: Predict List Scrollable */}
+                <div className="flex-1 overflow-y-auto pr-2">
+                  <PredictList keyword={result?.prediction || result} />
                 </div>
               </div>
-            ) : (
-              <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-                Prediction Result: {typeof result === "string" ? result : result.prediction || "N/A"}
-              </h2>
-            )}
-
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">Related Blogs:</h3>
-            {blogs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {blogs.map((blog, idx) => (
-                  <div
-                    key={idx}
-                    className="border border-gray-300 rounded-lg p-4 shadow hover:shadow-md transition"
-                  >
-                    <h4 className="text-lg font-bold text-blue-600 mb-2">{blog.title}</h4>
-                    <p className="text-gray-600 line-clamp-3">{blog.description}</p>
-                    <a
-                      href={`/blog/${blog._id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-500 underline mt-2 inline-block"
-                    >
-                      Read more →
-                    </a>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500">No related blogs found.</p>
-            )}
+            </div>
           </div>
-        </div>
+
       )}
 
       <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
@@ -212,7 +195,6 @@ export default function ResumePrediction({ user }) {
               Please enter your details so the system can suggest the most suitable career for you.
             </p>
 
-            {/* Skill */}
             <label className="block mb-2 font-medium flex items-center gap-1">
               Skill *
               <span className="relative group cursor-pointer text-blue-500">
@@ -232,7 +214,6 @@ export default function ResumePrediction({ user }) {
               placeholder="e.g., JavaScript, Python"
             />
 
-            {/* Certificate */}
             <label className="block mb-2 font-medium flex items-center gap-1">
               Certificate *
               <span className="relative group cursor-pointer text-blue-500">
@@ -252,7 +233,6 @@ export default function ResumePrediction({ user }) {
               placeholder="e.g., Bachelor's in Computer Science"
             />
 
-            {/* Experience */}
             <label className="block mb-2 font-medium flex items-center gap-1">
               Experience *
               <span className="relative group cursor-pointer text-blue-500">
@@ -290,7 +270,7 @@ export default function ResumePrediction({ user }) {
         </div>
       </form>
 
-      <PredictList uid={user?.userId} />
+      <PredictLog uid={user?.userId} />
     </div>
   );
 }

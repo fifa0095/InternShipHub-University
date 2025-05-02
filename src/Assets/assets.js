@@ -39,42 +39,42 @@ export const assets = {
 };
 
 export const jobInfo = {
-  "Cloud Management": {
+  Cloud: {
     title: "Cloud Management",
     description:
       "สายงาน Cloud Management มีหน้าที่ดูแลระบบโครงสร้างพื้นฐานบนคลาวด์ เช่น AWS, Azure หรือ Google Cloud โดยเน้นความปลอดภัย การขยายตัว และความพร้อมใช้งานสูง",
     skills: ["Cloud Computing", "AWS", "Azure", "DevOps"],
     image: assets.cloud,
   },
-  "Data & AI": {
+  Data: {
     title: "Data & AI",
     description:
       "สายงานด้าน Data & AI มุ่งเน้นการวิเคราะห์ข้อมูลเชิงลึกและการสร้างโมเดล AI เพื่อช่วยในการตัดสินใจธุรกิจแบบแม่นยำ",
     skills: ["Python", "Machine Learning", "TensorFlow", "Data Visualization"],
     image: assets.dataAi,
   },
-  "Designer": {
+  Designer: {
     title: "Designer",
     description:
       "สายงาน Designer มีบทบาทในการออกแบบประสบการณ์ผู้ใช้ (UX) และส่วนติดต่อผู้ใช้ (UI) เพื่อให้แอปพลิเคชันดูดีและใช้งานง่าย",
     skills: ["UI/UX", "Figma", "Adobe XD", "Design Thinking"],
     image: assets.designer,
   },
-  "Developer": {
+  Developer: {
     title: "Developer",
     description:
       "Developer คือผู้พัฒนาแอปพลิเคชันทั้งฝั่ง Frontend และ Backend ด้วยภาษาต่าง ๆ เช่น JavaScript, Python, Node.js",
     skills: ["JavaScript", "React", "Node.js", "TypeScript"],
     image: assets.developer,
   },
-  "QA & Tester": {
+  Tester: {
     title: "QA & Tester",
     description:
       "สายงาน QA & Tester มีหน้าที่ตรวจสอบคุณภาพของซอฟต์แวร์ ตรวจหาบั๊ก และสร้างระบบทดสอบอัตโนมัติ",
     skills: ["Selenium", "JUnit", "Manual Testing", "Test Automation"],
     image: assets.tester,
   },
-  "Security": {
+  Security: {
     title: "Security",
     description:
       "สายงาน Security ทำหน้าที่วางระบบความปลอดภัย ตรวจสอบช่องโหว่ และป้องกันภัยคุกคามไซเบอร์ในองค์กร",
