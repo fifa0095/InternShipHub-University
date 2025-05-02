@@ -21,23 +21,33 @@ const getUsernameForBlogs = async (blogs) => {
 
 
 exports.createBlog = async (req, res) => {
-    try {
+  try {
+      const existingBlog = await Blog.findOne({ title: req.body.title });
 
-        const existingBlog = await Blog.findOne({ title: req.body.title });
+      if (existingBlog) {
+          return res.status(400).json({ error: 'Blog with this title already exists' });
+      }
 
-        if (existingBlog) {
-            return res.status(400).json({ error: 'Blog with this title already exists' });
-        }
+      let bannerUrl = null;
+      if (req.file) {
+          bannerUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+      }
 
-        
-        const blog = new Blog(req.body);
-        await blog.save();
-        res.status(201).json(blog);
-    } catch (error) {
-        console.error("Error Saving Blog:", error.message);
-        res.status(400).json({ error: error.message });
-    }
+      const blogData = {
+          ...req.body,
+          banner_link: bannerUrl, // Save the image URL or base64 here
+      };
+
+      const blog = new Blog(blogData);
+      await blog.save();
+
+      res.status(201).json(blog);
+  } catch (error) {
+      console.error("Error Saving Blog:", error.message);
+      res.status(400).json({ error: error.message });
+  }
 };
+
 
 exports.getAllBlog = async (req, res) => {
   try {

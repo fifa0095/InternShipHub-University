@@ -1,4 +1,27 @@
 const Comment = require('../models/Comment');
+const User = require('../models/User');
+
+const getUsernameForComments = async (Comments) => {
+    if (!Array.isArray(Comments)) return Comments;
+  
+    const uid = [...new Set(Comments.map(comment => comment.uid?.toString()))];
+  
+    const users = await User.find({ _id: { $in: uid } }).lean();
+    const userMap = {};
+    users.forEach(user => {
+      userMap[user._id.toString()] = user.name;
+    });
+  
+    return Comments.map(comment => {
+      const plainComment = comment.toObject ? comment.toObject() : comment;
+      return {
+        ...plainComment,
+        username: userMap[comment.uid?.toString()] || "Unknown"
+      };
+    });
+  };
+  
+  
 
 exports.createComment = async (req, res) => {
     try {
@@ -41,7 +64,9 @@ exports.getCommentsByBlogId = async (req, res) => {
             return res.status(404).json({ message: 'No comments found for this blog' });
         }
 
-        res.status(200).json(comments);
+        const enrichedComment = await getUsernameForComments(comments);
+
+        res.status(200).json(enrichedComment);
     } catch (error) {
         console.error("Error Fetching Comments by Blog ID:", error.message);
         res.status(400).json({ error: error.message });
