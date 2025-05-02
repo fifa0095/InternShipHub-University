@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 export default function EditAccount({ user }) {
   const [form, setForm] = useState({
-    name: user?.name || "",
+    name: user?.userName || "",
     email: user?.email || "",
     old_password: "",
     password: "",
@@ -22,17 +22,23 @@ export default function EditAccount({ user }) {
     e.preventDefault();
     setLoading(true);
 
+    const noChange =
+      form.name === user.name &&
+      form.email === user.email &&
+      !form.password;
+
+    if (noChange) {
+      toast.info("ไม่มีการเปลี่ยนแปลงข้อมูล");
+      setLoading(false);
+      return;
+    }
+
     const bodyData = {
-      _id: user._id,
+      _id: user.userId,
       name: form.name,
       email: form.email,
-      isPremium: user?.isPremium,
-      createdAt: user?.createdAt,
-      resume: user?.resume,
-      __v: user?.__v,
     };
 
-    // ถ้าจะเปลี่ยนรหัสผ่าน ต้องมี old_password
     if (form.password) {
       if (!form.old_password) {
         toast.error("กรุณากรอกรหัสผ่านเดิมเพื่อเปลี่ยนรหัสใหม่");
@@ -47,7 +53,7 @@ export default function EditAccount({ user }) {
 
     try {
       const res = await fetch(`http://localhost:8080/api/updateUser`, {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -56,20 +62,23 @@ export default function EditAccount({ user }) {
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error || "Update failed");
+      if (!res.ok) {
+        toast.error(data.error || "อัปเดตบัญชีไม่สำเร็จ");
+        throw new Error(data.error || "Update failed");
+      }
 
       toast.success("✅ อัปเดตบัญชีเรียบร้อยแล้ว!");
-      setUpdatedUser(data); // แสดงผลลัพธ์ที่ได้จาก API
+      setUpdatedUser(data.updatedUser || data); // ใช้ข้อมูลที่ได้จาก backend
+
     } catch (err) {
       console.error("❌ Update error:", err);
-      toast.error("อัปเดตบัญชีไม่สำเร็จ");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w mx-auto mt-10 bg-white p-6 shadow-md rounded-lg">
+    <div className="max-w-6xl mx-auto mt-20 bg-white p-6 shadow-md rounded-lg">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">✏️ Edit Account</h2>
 
       <form onSubmit={handleSubmit}>
