@@ -7,6 +7,8 @@ import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function CommentList({ postId, userId }) {
+  console.log("user Id: ",userId )
+  console.log("Post Id: ",postId )
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -60,10 +62,10 @@ export default function CommentList({ postId, userId }) {
               <div className="flex items-center space-x-2 mb-2">
                 <Avatar>
                   <AvatarFallback>
-                    {comment?.uid?.name?.charAt(0) || "U"}
+                    {comment?.username.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
-                <p className="font-medium">{comment?.uid?.name || "Anonymous"}</p> {/* ใช้ name จาก populate */}
+                <p className="font-medium">{comment?.username || "Anonymous"}</p> {/* ใช้ name จาก populate */}
               </div>
 
               {/* แสดงปุ่มลบเฉพาะเจ้าของคอมเมนต์ */}

@@ -82,7 +82,8 @@ export default function CommentSection({ user, postId }) {
       </Button>
 
       {/* ส่งข้อมูล user ไปให้ CommentList */}
-      <CommentList postId={postId} user={user} />
+      
+      <CommentList postId={postId} userId={user.userId} />
     </form>
   );
 }
