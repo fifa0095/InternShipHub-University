@@ -1,6 +1,25 @@
 const Blog = require('../models/Blog');
 const User = require('../models/User');
 
+const getUsernameForBlogs = async (blogs) => {
+  if (!Array.isArray(blogs)) return blogs;
+
+  const authorIds = [...new Set(blogs.map(blog => blog.author?.toString()))];
+
+  const users = await User.find({ _id: { $in: authorIds } }).lean();
+  const userMap = {};
+  users.forEach(user => {
+    userMap[user._id.toString()] = user.name;
+  });
+
+  return blogs.map(blog => ({
+    ...blog,
+    author_uid: blog.author,
+    author: userMap[blog.author?.toString()] || "Unknown"
+  }));
+};
+
+
 exports.createBlog = async (req, res) => {
     try {
 
@@ -26,31 +45,13 @@ exports.getAllBlog = async (req, res) => {
       type: { $in: ["auto_news", "user_blogs"] }
     }).lean(); // use .lean() for better performance if no Mongoose methods needed
 
-    // Collect all unique author IDs
-    const authorIds = [...new Set(blogs.map(blog => blog.author))];
+    const enrichedBlogs = await getUsernameForBlogs(blogs);
 
-    // Fetch all authors in one query
-    const users = await User.find({ _id: { $in: authorIds } }).lean();
-
-    // Map user ID to user name
-    const userMap = {};
-    users.forEach(user => {
-      userMap[user._id.toString()] = user.name;
-    });
-
-    // Replace author ID with author name
-    const blogsWithAuthorName = blogs.map(blog => ({
-      ...blog,
-      author_uid: blog.author, // keep original ID as author_uid
-      author: userMap[blog.author.toString()] || "Unknown"
-    }));
-
-    res.status(200).json(blogsWithAuthorName);
+    res.status(200).json(enrichedBlogs);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 exports.getBlogByPage = async (req, res) => {
     try {
@@ -62,8 +63,10 @@ exports.getBlogByPage = async (req, res) => {
         .sort({ createdAt: -1 }) // latest first
         .skip(skip)
         .limit(limit);
+
+      const enrichedBlogs = await getUsernameForBlogs(blogs);
   
-      res.status(200).json(blogs);
+      res.status(200).json(enrichedBlogs);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -77,16 +80,9 @@ exports.getBlogByUid = async (req, res) => {
         return res.status(404).json({ error: 'blog not found' });
       }
   
-      const user = await User.findById(req.params.uid).lean();
-      const authorName = user ? user.name : "Unknown";
+      const enrichedBlogs = await getUsernameForBlogs(blogs);
   
-      const blogsWithAuthor = blogs.map(blog => ({
-        ...blog,
-        author_uid: blog.author,
-        author: authorName
-      }));
-  
-      res.status(200).json(blogsWithAuthor);
+      res.status(200).json(enrichedBlogs);
     } catch (error) {
       console.error("Error Fetching Blog:", error.message);
       res.status(400).json({ error: error.message });
@@ -99,21 +95,10 @@ exports.getReview = async (req, res) => {
         type: "company_reviews" 
       }).lean();
   
-      const authorIds = [...new Set(blogs.map(blog => blog.author))];
   
-      const users = await User.find({ _id: { $in: authorIds } }).lean();
-      const userMap = {};
-      users.forEach(user => {
-        userMap[user._id.toString()] = user.name;
-      });
+      const enrichedBlogs = await getUsernameForBlogs(blogs);
   
-      const blogsWithAuthorName = blogs.map(blog => ({
-        ...blog,
-        author_uid: blog.author,
-        author: userMap[blog.author.toString()] || "Unknown"
-      }));
-  
-      res.status(200).json(blogsWithAuthorName);
+      res.status(200).json(enrichedBlogs);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -146,137 +131,83 @@ exports.deleteBlog = async (req, res) => {
 exports.searchBlogs = async (req, res) => {
   try {
     const { keyword } = req.params;
-        if (!keyword) {
-            return res.status(400).json({ message: 'Keyword is required' });
+    if (!keyword) {
+      return res.status(400).json({ message: 'Keyword is required' });
+    }
+
+    const keywordRegex = new RegExp(keyword, "i");
+
+    const blogs = await Blog.aggregate([
+      {
+        $addFields: {
+          tagsArray: {
+            $cond: [
+              { $eq: [{ $type: "$tags" }, "object"] },
+              { $objectToArray: "$tags" },
+              []
+            ]
+          }
         }
-
-        const keywordRegex = new RegExp(keyword, "i");
-
-        console.log(keywordRegex);
-
-        // const blogs = await Blog.find({title: { $regex: keywordRegex }});
-        // const blogs = await Blog.find({company_name: { $regex: keywordRegex }});
-        // const blogs = await Blog.aggregate([
-        //   {
-        //     $addFields: {
-        //       tagsArray: {
-        //         $cond: [
-        //           { $eq: [{ $type: "$tags" }, "object"] },
-        //           { $objectToArray: "$tags" },
-        //           []
-        //         ]
-        //       }
-        //     }
-        //   },
-        //   {
-        //     $unwind: {
-        //       path: "$tagsArray",
-        //       preserveNullAndEmptyArrays: true
-        //     }
-        //   },
-        //   {
-        //     $match: {
-        //       $or: [
-        //         { "tagsArray.k": { $regex: keywordRegex } },
-        //         { "tagsArray.v": { $regex: keywordRegex } },
-        //         {
-        //           $expr: {
-        //             $and: [
-        //               { $eq: [{ $type: "$tagsArray.v" }, "array"] },
-        //               {
-        //                 $gt: [
-        //                   {
-        //                     $size: {
-        //                       $filter: {
-        //                         input: "$tagsArray.v",
-        //                         as: "tagValue",
-        //                         cond: { $regexMatch: { input: "$$tagValue", regex: keywordRegex } }
-        //                       }
-        //                     }
-        //                   },
-        //                   0
-        //                 ]
-        //               }
-        //             ]
-        //           }
-        //         }
-        //       ]
-        //     }
-        //   },
-        //   {
-        //     $project: {
-        //       title: 1,
-        //       content: 1,
-        //       tags: 1
-        //     }
-        //   }
-        // ]);
-
-        const blogs = await Blog.aggregate([
-          {
-            $addFields: {
-              tagsArray: {
-                $cond: [
-                  { $eq: [{ $type: "$tags" }, "object"] },
-                  { $objectToArray: "$tags" },
-                  []
+      },
+      {
+        $unwind: {
+          path: "$tagsArray",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $match: {
+          $or: [
+            { title: { $regex: keywordRegex } },
+            { company_name: { $regex: keywordRegex } },
+            { "tagsArray.k": { $regex: keywordRegex } },
+            { "tagsArray.v": { $regex: keywordRegex } },
+            {
+              $expr: {
+                $and: [
+                  { $eq: [{ $type: "$tagsArray.v" }, "array"] },
+                  {
+                    $gt: [
+                      {
+                        $size: {
+                          $filter: {
+                            input: "$tagsArray.v",
+                            as: "tagValue",
+                            cond: { $regexMatch: { input: "$$tagValue", regex: keywordRegex } }
+                          }
+                        }
+                      },
+                      0
+                    ]
+                  }
                 ]
               }
             }
-          },
-          {
-            $unwind: {
-              path: "$tagsArray",
-              preserveNullAndEmptyArrays: true
-            }
-          },
-          {
-            $match: {
-              $or: [
-                { title: { $regex: keywordRegex } },
-                { company_name: { $regex: keywordRegex } },
-                { "tagsArray.k": { $regex: keywordRegex } },
-                { "tagsArray.v": { $regex: keywordRegex } },
-                {
-                  $expr: {
-                    $and: [
-                      { $eq: [{ $type: "$tagsArray.v" }, "array"] },
-                      {
-                        $gt: [
-                          {
-                            $size: {
-                              $filter: {
-                                input: "$tagsArray.v",
-                                as: "tagValue",
-                                cond: { $regexMatch: { input: "$$tagValue", regex: keywordRegex } }
-                              }
-                            }
-                          },
-                          0
-                        ]
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          // {
-          //   $project: {
-          //     title: 1,
-          //     content: 1,
-          //     company_name: 1,
-          //     tags: 1
-          //   }
-          // }
-        ]);
-        
-        res.json(blogs);
+          ]
+        }
+      },
+      {
+        $group: {
+          _id: "$_id",
+          doc: { $first: "$$ROOT" }
+        }
+      },
+      {
+        $replaceRoot: { newRoot: "$doc" }
+      }
+    ]);
+
+    const enrichedBlogs = await getUsernameForBlogs(blogs);
+
+
+    res.json(enrichedBlogs);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+
 
 
 // exports.searchBlogs = async (req, res) => {
