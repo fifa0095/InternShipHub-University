@@ -52,11 +52,12 @@ function CreateBlogForm({ user }) {
       tags: [],
       src_from: "",
       banner_link: "",
-      type: user?.isPremium ? "" : "Blog",
+      type: user?.type === "admin" ? "" : "user_blogs",
     },
   });
 
   const bannerLink = watch("banner_link");
+  const typeValue = watch("type");
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
@@ -73,10 +74,14 @@ function CreateBlogForm({ user }) {
     const companyNameToUse =
       data.company_name === "other" ? otherCompanyName : data.company_name;
 
-    const tagsObject = {};
-    data.tags.forEach((tag) => {
-      tagsObject[tag] = [];
-    });
+    let tagsObject = {};
+    if (data.type === "company_reviews") {
+      tagsObject = { NODATA: "" };
+    } else {
+      (data.tags || []).forEach((tag) => {
+        tagsObject[tag] = [];
+      });
+    }
 
     try {
       const response = await fetch("http://localhost:8080/api/createBlog", {
@@ -87,15 +92,12 @@ function CreateBlogForm({ user }) {
           company_name: companyNameToUse,
           content: Array.isArray(data.content) ? data.content : [data.content],
           tags: tagsObject,
-          type: user?.isPremium ? data.type || "Blog" : "Blog",
-          author: user?.userName ?? "anonymous",
+          type: user?.type === "admin" ? data.type || "user_blogs" : "user_blogs",
+          author: user?.userId,
         }),
       });
 
       const result = await response.json();
-      console.log("API Response:", result);
-      console.log("Response Status:", response.status);
-
       if (response.status === 201) {
         toast({
           title: "Success",
@@ -132,7 +134,7 @@ function CreateBlogForm({ user }) {
           disabled={
             !watch("title") ||
             !watch("content").length ||
-            (!watch("tags")?.length) ||
+            (typeValue !== "company_reviews" && !watch("tags")?.length) ||
             (watch("company_name") === "other" && !otherCompanyName) ||
             isLoading
           }
@@ -144,7 +146,7 @@ function CreateBlogForm({ user }) {
 
       <main>
         <form>
-          {user?.isPremium && (
+          {user?.type === "admin" && (
             <Controller
               name="type"
               control={control}
@@ -208,23 +210,27 @@ function CreateBlogForm({ user }) {
           )}
           {errors.company_name && <p className="text-red-600 text-sm">{errors.company_name.message}</p>}
 
-          <Controller
-            name="tags"
-            control={control}
-            render={({ field }) => (
-              <Select
-                isMulti
-                options={BLOG_CATEGORIES.map((t) => ({ value: t.key, label: t.value }))}
-                value={field.value.map((val) => ({
-                  value: val,
-                  label: BLOG_CATEGORIES.find((cat) => cat.key === val)?.value || val,
-                }))}
-                onChange={(options) => field.onChange(options.map((opt) => opt.value))}
-                className="mb-4"
+          {typeValue !== "company_reviews" && (
+            <>
+              <Controller
+                name="tags"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    isMulti
+                    options={BLOG_CATEGORIES.map((t) => ({ value: t.key, label: t.value }))}
+                    value={field.value.map((val) => ({
+                      value: val,
+                      label: BLOG_CATEGORIES.find((cat) => cat.key === val)?.value || val,
+                    }))}
+                    onChange={(options) => field.onChange(options.map((opt) => opt.value))}
+                    className="mb-4"
+                  />
+                )}
               />
-            )}
-          />
-          {errors.tags && <p className="text-red-600 text-sm">{errors.tags.message}</p>}
+              {errors.tags && <p className="text-red-600 text-sm">{errors.tags.message}</p>}
+            </>
+          )}
 
           <Controller
             name="src_from"
@@ -262,7 +268,6 @@ function CreateBlogForm({ user }) {
                 toast({ title: "Error", description: error.message, variant: "destructive" });
               }}
             />
-
             {bannerLink && (
               <div className="mt-4 w-full">
                 <img
