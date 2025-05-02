@@ -1,24 +1,39 @@
-// app/edit-blog/[id]/page.js
 import EditBlogForm from "@/components/blog/EditBlog";
 import { verifyAuth } from "@/lib/auth";
 import { cookies } from "next/headers";
-import { getBlogPostByIdAction } from "@/actions/blog";
+import { notFound } from "next/navigation";
+
+async function getBlogById(blogId) {
+  try {
+    const res = await fetch(`http://localhost:8080/api/getBlogByBlogId/${blogId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      return { error: "Blog not found" };
+    }
+
+    return { post: data[0] };
+  } catch (err) {
+    console.error("❌ Failed to fetch blog:", err.message);
+    return { error: err.message };
+  }
+}
 
 export default async function EditBlogPage({ params }) {
   const { blogId } = params;
-  const data = await getBlogPostByIdAction(blogId);
-  if (data.error) notFound();
+  const data = await getBlogById(blogId);
+
+  if (data.error || !data.post) return <p className="text-center text-gray-500 pt-20">Blog not found</p>;
 
   const token = (await cookies()).get("token")?.value;
   const user = await verifyAuth(token);
-  const uid = user?.userId;
-
-  const { post } = data;
-  const resBlog = JSON.parse(post);
-    
   
-
-  if (!resBlog) return <p className="text-center text-gray-500 pt-20">Blog not found</p>;
-
-  return <EditBlogForm blog={resBlog} user={user} />;
+  return <EditBlogForm blog={data.post} user={user} />;
 }

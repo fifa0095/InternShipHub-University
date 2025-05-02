@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 
 function BlogDetails({ post }) {
+  
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
       {/* Header */}
