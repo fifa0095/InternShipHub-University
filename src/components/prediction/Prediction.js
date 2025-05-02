@@ -1,7 +1,8 @@
-"use client"; 
-import PredictList from "./PredictList";
+"use client";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import PredictList from "./PredictList";
+import { jobInfo } from "@/Assets/assets";
 
 export default function ResumePrediction({ user }) {
   const [form, setForm] = useState({
@@ -41,7 +42,6 @@ export default function ResumePrediction({ user }) {
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.error || "Failed to read PDF");
 
       setForm((prev) => ({
@@ -50,7 +50,7 @@ export default function ResumePrediction({ user }) {
         educational: data.educational || "",
       }));
 
-      setPdfText(data.text || "");  // แสดงข้อความจาก PDF
+      setPdfText(data.text || "");
       toast.success("✅ Extracted info from PDF!");
     } catch (error) {
       console.error("❌ PDF Read Error:", error);
@@ -72,25 +72,19 @@ export default function ResumePrediction({ user }) {
     try {
       const response = await fetch("http://localhost:8080/api/predict", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(jsonData), 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(jsonData),
       });
 
       const predictionResult = await response.json();
-
       if (!response.ok) throw new Error(predictionResult.error || "Prediction failed");
 
       setResult(predictionResult);
       toast.success("✅ Prediction sent successfully!");
 
-      const predictionText =
-        predictionResult.prediction || predictionResult.result || predictionResult;
+      const predictionText = predictionResult.prediction || predictionResult.result || predictionResult;
 
-      const blogRes = await fetch(
-        `http://localhost:8080/api/search/${encodeURIComponent(predictionText)}`
-      );
+      const blogRes = await fetch(`http://localhost:8080/api/search/${encodeURIComponent(predictionText)}`);
       const blogData = await blogRes.json();
       setBlogs(blogData || []);
     } catch (error) {
@@ -110,9 +104,7 @@ export default function ResumePrediction({ user }) {
     <div className="py-10 bg-gray-100 relative">
       {loading && (
         <div className="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-lg font-medium">
-            Loading...
-          </div>
+          <div className="bg-white p-6 rounded-lg shadow-lg text-lg font-medium">Loading...</div>
         </div>
       )}
 
@@ -125,10 +117,29 @@ export default function ResumePrediction({ user }) {
             >
               ✖
             </button>
-            <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-              Prediction Result:{" "}
-              {typeof result === "string" ? result : result.prediction || "N/A"}
-            </h2>
+
+            {/* ✅ แสดงผลลัพธ์พร้อม asset */}
+            {typeof result !== "string" && result?.prediction && jobInfo[result.prediction] ? (
+              <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
+                <img
+                  src={jobInfo[result.prediction].image.src}
+                  alt={result.prediction}
+                  className="w-24 h-24 object-contain"
+                />
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-800">
+                    Prediction Result: {result.prediction}
+                  </h2>
+                  <p className="text-gray-600 mt-2">
+                    {jobInfo[result.prediction].description}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+                Prediction Result: {typeof result === "string" ? result : result.prediction || "N/A"}
+              </h2>
+            )}
 
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Related Blogs:</h3>
             {blogs.length > 0 ? (
@@ -138,9 +149,7 @@ export default function ResumePrediction({ user }) {
                     key={idx}
                     className="border border-gray-300 rounded-lg p-4 shadow hover:shadow-md transition"
                   >
-                    <h4 className="text-lg font-bold text-blue-600 mb-2">
-                      {blog.title}
-                    </h4>
+                    <h4 className="text-lg font-bold text-blue-600 mb-2">{blog.title}</h4>
                     <p className="text-gray-600 line-clamp-3">{blog.description}</p>
                     <a
                       href={`/blog/${blog._id}`}
@@ -148,7 +157,7 @@ export default function ResumePrediction({ user }) {
                       rel="noopener noreferrer"
                       className="text-sm text-blue-500 underline mt-2 inline-block"
                     >
-                      Read more → 
+                      Read more →
                     </a>
                   </div>
                 ))}
@@ -197,10 +206,11 @@ export default function ResumePrediction({ user }) {
             </button>
           </div>
 
-
           <div className="md:w-1/2 pl-0 md:pl-6">
-          <h2 className="text-2xl font-bold mt-8">Fill in Your Information for Career Prediction</h2>
-          <p className="text-l font-semibold mb-4 text-gray-400 ">Please enter your details so the system can suggest the most suitable career for you.</p>
+            <h2 className="text-2xl font-bold mt-8">Fill in Your Information for Career Prediction</h2>
+            <p className="text-l font-semibold mb-4 text-gray-400">
+              Please enter your details so the system can suggest the most suitable career for you.
+            </p>
 
             {/* Skill */}
             <label className="block mb-2 font-medium flex items-center gap-1">
@@ -279,6 +289,7 @@ export default function ResumePrediction({ user }) {
           </button>
         </div>
       </form>
+
       <PredictList uid={user?.userId} />
     </div>
   );

@@ -15,7 +15,8 @@ export async function verifyAuth(token) {
       userId: payload.userId,
       email: payload.email,
       userName: payload.userName,
-      isPremium: payload.isPremium,
+      type: payload.type,
+      
     };
   } catch (e) {
     console.error(e, "Error fetching token");

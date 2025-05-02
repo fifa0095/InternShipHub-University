@@ -8,7 +8,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
-import { registerUserAction } from "@/actions/register";
 import { useRouter } from "next/navigation";
 
 const schema = z.object({
