@@ -88,6 +88,23 @@ exports.getBlogByUid = async (req, res) => {
       res.status(400).json({ error: error.message });
     }
   };
+
+exports.getBlogByBlogid = async (req, res) => {
+  try {
+    const blogs = await Blog.findById(req.params.blogid ).lean();
+
+    if (blogs.length === 0) {
+      return res.status(404).json({ error: 'blog not found' });
+    }
+
+    const enrichedBlogs = await getUsernameForBlogs([blogs]);
+
+    res.status(200).json(enrichedBlogs);
+  } catch (error) {
+    console.error("Error Fetching Blog:", error.message);
+    res.status(400).json({ error: error.message });
+  }
+};
   
 exports.getReview = async (req, res) => {
     try {
