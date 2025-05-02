@@ -107,10 +107,16 @@ exports.getReview = async (req, res) => {
 
 exports.editBlog = async (req, res) => {
     try {
-        const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.status(200).json(blog);
+      const userblog = req.body;
+      userblog.author = userblog.author_uid;
+      delete userblog.author_uid;
+      const blog = await Blog.findByIdAndUpdate(req.body._id, req.body, { new: true });
+      if (!blog){
+        res.status(404).json({error: "blog not found" });
+      }
+      res.status(200).json(blog);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });
     }
 };
 
