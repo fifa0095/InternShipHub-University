@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import CompanyBarChart from "@/components/dataVirtual/Company";
 import TimelineGraph from "@/components/dataVirtual/Date";
-import Tags from "@/components/dataVirtual/Tags"; // นำเข้า Tags Component
+import Tags from "@/components/dataVirtual/Tags"; // pie chart: tag category
+import TagValueChart from "@/components/dataVirtual/TagValueChart"; // ✅ pie chart: tag values
 
 export default function DataVirtualization() {
   const [companyData, setCompanyData] = useState([]);
   const [timelineData, setTimelineData] = useState([]);
-  const [tagsData, setTagsData] = useState([]);
+  const [tagsData, setTagsData] = useState([]); // category-level
+  const [tagValueData, setTagValueData] = useState([]); // ✅ value-level
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,6 +21,7 @@ export default function DataVirtualization() {
         const companyWeightCounts = {};
         const datePostCounts = {};
         const tagCategoryCounts = {};
+        const tagValueCounts = {}; // ✅ นับค่าภายในแท็ก
 
         blogs.forEach(blog => {
           const companyName = blog.company_name;
@@ -33,9 +36,17 @@ export default function DataVirtualization() {
           }
 
           if (blog.tags && typeof blog.tags === "object") {
-            Object.keys(blog.tags).forEach(category => {
-              if (category !== "NODATA") { // ฟิลเตอร์เอา "NODATA" ออก
+            Object.entries(blog.tags).forEach(([category, values]) => {
+              if (category !== "NODATA") {
                 tagCategoryCounts[category] = (tagCategoryCounts[category] || 0) + 1;
+
+                if (Array.isArray(values)) {
+                  values.forEach(value => {
+                    if (value !== "NODATA") {
+                      tagValueCounts[value] = (tagValueCounts[value] || 0) + 1;
+                    }
+                  });
+                }
               }
             });
           }
@@ -51,14 +62,20 @@ export default function DataVirtualization() {
           postCount,
         }));
 
-        const chartData = Object.entries(tagCategoryCounts).map(([category, count]) => ({
-          name: category,
-          value: count,
+        const categoryChartData = Object.entries(tagCategoryCounts).map(([name, value]) => ({
+          name,
+          value,
+        }));
+
+        const valueChartData = Object.entries(tagValueCounts).map(([name, value]) => ({
+          name,
+          value,
         }));
 
         setCompanyData(companyData);
         setTimelineData(timelineData);
-        setTagsData(chartData);
+        setTagsData(categoryChartData);
+        setTagValueData(valueChartData); // ✅ ตั้งค่าข้อมูลสำหรับ tag values
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -72,19 +89,23 @@ export default function DataVirtualization() {
     <div className="p-6 mt-12">
       <h1 className="text-3xl font-bold mb-6">📊 Data Virtualization</h1>
 
-      {/* Tag Category Analysis and Timeline Graph in the same row */}
+      {/* Tag Category Analysis and Tag Value Analysis side-by-side */}
       <div className="flex justify-between space-x-4">
-        {/* Tag Category Analysis */}
         <div className="w-1/2">
           <h2 className="text-2xl font-bold mb-4 mt-8">Tag Category Analysis</h2>
           <Tags tagsData={tagsData} />
         </div>
 
-        {/* Timeline Graph */}
         <div className="w-1/2">
-          <h2 className="text-2xl font-bold mb-4 mt-8">Posts Over Time</h2>
-          <TimelineGraph timelineData={timelineData} />
+          <h2 className="text-2xl font-bold mb-4 mt-8">Tag Value Analysis</h2>
+          <TagValueChart tagValueData={tagValueData} /> {/* ✅ Pie chart แสดงค่าภายในแท็ก */}
         </div>
+      </div>
+
+      {/* Timeline Graph */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-4">Posts Over Time</h2>
+        <TimelineGraph timelineData={timelineData} />
       </div>
 
       {/* Company Bar Chart */}
