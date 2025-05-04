@@ -23,7 +23,7 @@ const blogPostSchema = z.object({
   title: z.string().min(1, "Title is required"),
   company_name: z.string().min(1, "Company name is required"),
   content: z.array(z.string()).min(1, "Content is required"),
-  tags: z.array(z.string()).min(1, "At least one tag is required"),
+  tags: z.array(z.string()).optional(),
   src_from: z.string().optional(),
   banner_link: z.string().optional(),
   type: z.string().optional(),
