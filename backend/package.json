@@ -19,7 +19,7 @@
     "express": "^4.21.2",
     "jose": "^6.0.10",
     "jose-node-cjs-runtime": "^5.10.0",
-    "mongoose": "^8.12.2",
+    "mongoose": "^8.14.1",
     "multer": "^1.4.5-lts.2",
     "nodemon": "^3.1.9",
     "pdf-parse": "^1.1.1",
