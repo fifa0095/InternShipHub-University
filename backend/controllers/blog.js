@@ -23,20 +23,22 @@ const getUsernameForBlogs = async (blogs) => {
 
 exports.createBlog = async (req, res) => {
   try {
-    const userblog = req.body;
-    userblog.author = userblog.author_uid;
-    delete userblog.author_uid;
-    const blog = await Blog.findByIdAndUpdate(req.body._id, req.body, { new: true });
-    if (!blog){
-      res.status(404).json({error: "blog not found" });
-    }
-    res.status(200).json(blog);
+
+      const existingBlog = await Blog.findOne({ title: req.body.title });
+
+      if (existingBlog) {
+          return res.status(400).json({ error: 'Blog with this title already exists' });
+      }
+
+      
+      const blog = new Blog(req.body);
+      await blog.save();
+      res.status(201).json(blog);
   } catch (error) {
       console.error("Error Saving Blog:", error.message);
       res.status(400).json({ error: error.message });
   }
 };
-
 exports.getAllBlog = async (req, res) => {
   try {
     const blogs = await Blog.find({
