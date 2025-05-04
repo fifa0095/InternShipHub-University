@@ -31,7 +31,7 @@ function LoginForm() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const result = await fetch("http://localhost:8080/api/login", {
+      const result = await fetch(process.env.API_PATH + "/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

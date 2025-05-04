@@ -44,7 +44,7 @@ export default function HomeComponent({ posts: initialPosts }) {
     try {
       console.log("🔍 Searching for:", searchTerm); 
       setIsSearching(true);
-      const response = await fetch(`http://localhost:8080/api/search/${encodeURIComponent(searchTerm)}`);
+      const response = await fetch(`${process.env.API_PATH}/api/search/${encodeURIComponent(searchTerm)}`);
       if (!response.ok) throw new Error('Search request failed');
       const searchResults = await response.json();
       console.log("✅ Search results:", searchResults);
