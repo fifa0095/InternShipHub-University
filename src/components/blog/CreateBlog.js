@@ -6,48 +6,33 @@ import { Button } from "../ui/button";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { UploadButton } from "@uploadthing/react";
 import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import dynamic from "next/dynamic";
+import Select from "react-select";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { BLOG_CATEGORIES, COMPANY_LIST } from "@/lib/config";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 import "react-quill-new/dist/quill.snow.css";
 import "./quill-custom.css";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { BLOG_CATEGORIES } from "@/lib/config";
 
 const blogPostSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  content: z.string().min(1, "Content is required"),
-  category: z.string().min(1, "category is required"),
-  coverImage: z.string().min(1, "Image is required"),
+  company_name: z.string().min(1, "Company name is required"),
+  content: z.array(z.string()).min(1, "Content is required"),
+  tags: z.array(z.string()).optional(),
+  src_from: z.string().optional(),
+  banner_link: z.string().optional(),
+  type: z.string().optional(),
 });
 
-const isSuspiciousContent = (data) => {
-  const suspiciousPatterns = [
-    /<script>/i,
-    /javascript:/i,
-    /onload=/i,
-    /onclick=/i,
-    /'.*OR.*'/i,
-    /UNION SELECT/i,
-  ];
-
-  return suspiciousPatterns.some((pattern) => pattern.test(data.content));
-};
-
 function CreateBlogForm({ user }) {
-  const [quillLoaded, setQuillLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isOtherCompany, setIsOtherCompany] = useState(false);
+  const [otherCompanyName, setOtherCompanyName] = useState("");
   const quillRef = useRef(null);
   const router = useRouter();
   const { toast } = useToast();
@@ -62,103 +47,124 @@ function CreateBlogForm({ user }) {
     resolver: zodResolver(blogPostSchema),
     defaultValues: {
       title: "",
-      content: "",
-      category: "",
-      coverImage: "",
+      company_name: "",
+      content: [],
+      tags: [],
+      src_from: "",
+      banner_link: "",
+      type: user?.type === "admin" ? "" : "user_blogs",
     },
   });
 
-  const title = watch("title");
-  const category = watch("category");
-  const content = watch("content");
-  const coverImage = watch("coverImage");
+  const bannerLink = watch("banner_link");
+  const typeValue = watch("type");
 
-  const modules = useMemo(
-    () => ({
-      toolbar: [
-        [{ header: [1, 2, 3, 4, 5, 6, false] }],
-        ["bold", "italic", "underline", "strike"],
-        [{ list: "ordered" }, { list: "bullet" }],
-        [{ color: [] }, { background: [] }],
-        ["blockquote", "code-block"],
-        ["link"],
-        ["clean"],
-      ],
-    }),
-    []
-  );
+  useEffect(() => {
+    const subscription = watch((value, { name }) => {
+      if (name === "company_name") {
+        setIsOtherCompany(value.company_name === "other");
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const onBlogSubmit = async (data) => {
     setIsLoading(true);
+
+    const companyNameToUse =
+      data.company_name === "other" ? otherCompanyName : data.company_name;
+
+    let tagsObject = {};
+    if (data.type === "company_reviews") {
+      tagsObject = { NODATA: "" };
+    } else {
+      (data.tags || []).forEach((tag) => {
+        tagsObject[tag] = [];
+      });
+    }
+
     try {
-      const isSuspiciousInput = isSuspiciousContent(data);
-
-      const result = await fetch("/api/create-blog-post", {
+      const response = await fetch("http://localhost:8080/api/createBlog", {
         method: "POST",
-        headers: {
-          "Content-type": "application/json",
-          "x-arcjet-suspicious": isSuspiciousInput.toString(),
-        },
-        body: JSON.stringify(data),
-      }).then((res) => res.json());
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          company_name: companyNameToUse,
+          content: Array.isArray(data.content) ? data.content : [data.content],
+          tags: tagsObject,
+          type: user?.type === "admin" ? data.type || "user_blogs" : "user_blogs",
+          author: user?.userId,
+        }),
+      });
 
-      if (result.success) {
+      const result = await response.json();
+      if (response.status === 201) {
         toast({
           title: "Success",
-          description: result.success,
+          description: "Your blog has been successfully published! You can view it now.",
+          variant: "success",
         });
         router.push("/");
       } else {
         toast({
           title: "Error",
-          description: result.error,
-          varaint: "destructive",
+          description: result.error || "An unknown error occurred",
+          variant: "destructive",
         });
       }
     } catch (e) {
-      toast({
-        title: "Error",
-        description: "Some error occured",
-        varaint: "destructive",
-      });
+      console.error("Error occurred during submission:", e);
+      toast({ title: "Error", description: "Submission failed", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    setQuillLoaded(true);
-  }, []);
-
-  const isBtnDisabled = () => {
-    return (
-      title === "" || category === "" || coverImage === "" || content === ""
-    );
-  };
-
-  console.log(title, category, coverImage, content);
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+    <div className="max-w-7xl mx-auto px-4 pt-20">
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center space-x-4">
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarImage src="https://i.pinimg.com/736x/42/b5/76/42b57666dbe879a032955b85c5dcdcd5.jpg" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <div>
-            <p className="font-semibold">{user?.userName}</p>
-          </div>
+          <p className="font-semibold">{user?.userName}</p>
         </div>
         <Button
-          disabled={isBtnDisabled() || isLoading}
+          disabled={
+            !watch("title") ||
+            !watch("content").length ||
+            (typeValue !== "company_reviews" && !watch("tags")?.length) ||
+            (watch("company_name") === "other" && !otherCompanyName) ||
+            isLoading
+          }
           onClick={handleSubmit(onBlogSubmit)}
         >
           Publish
         </Button>
       </header>
+
       <main>
         <form>
+          {user?.type === "admin" && (
+            <Controller
+              name="type"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  options={[
+                    { value: "user_blogs", label: "Blog" },
+                    { value: "company_reviews", label: "Company Reviews" },
+                  ]}
+                  value={field.value ? { value: field.value, label: field.value } : null}
+                  onChange={(option) => field.onChange(option?.value)}
+                  placeholder="Select Type"
+                  className="mb-4"
+                />
+              )}
+            />
+          )}
+
           <Controller
             name="title"
             control={control}
@@ -167,84 +173,130 @@ function CreateBlogForm({ user }) {
                 {...field}
                 type="text"
                 placeholder="Title"
-                className="text-4xl font-bold border-none outline-none mb-4 p-0 focus-visible:ring-0"
+                className="text-4xl font-bold mb-4 border-none outline-none focus:ring-0"
+                onChange={(e) => field.onChange(e.target.value)}
               />
             )}
           />
-          {errors.title && (
-            <p className="text-sm text-red-600 mt-2">{errors.title.message}</p>
-          )}
+          {errors.title && <p className="text-red-600 text-sm">{errors.title.message}</p>}
+
           <Controller
-            name="category"
+            name="company_name"
+            control={control}
+            render={({ field }) => {
+              const selected = COMPANY_LIST.find((c) => c.key === field.value) || (field.value === "other" ? { key: "other", value: "Other" } : null);
+              return (
+                <Select
+                  options={[
+                    ...COMPANY_LIST.map((c) => ({ value: c.key, label: c.value })),
+                    { value: "other", label: "Other" },
+                  ]}
+                  value={selected ? { value: selected.key, label: selected.value } : null}
+                  onChange={(option) => field.onChange(option?.value ?? "")}
+                  placeholder="Select a Company..."
+                  isClearable
+                  className="mb-2"
+                />
+              );
+            }}
+          />
+          {isOtherCompany && (
+            <Input
+              value={otherCompanyName}
+              onChange={(e) => setOtherCompanyName(e.target.value)}
+              placeholder="Enter company name"
+              className="mb-4"
+            />
+          )}
+          {errors.company_name && <p className="text-red-600 text-sm">{errors.company_name.message}</p>}
+
+          {typeValue !== "company_reviews" && (
+            <>
+              <Controller
+                name="tags"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    isMulti
+                    options={BLOG_CATEGORIES.map((t) => ({ value: t.key, label: t.value }))}
+                    value={field.value.map((val) => ({
+                      value: val,
+                      label: BLOG_CATEGORIES.find((cat) => cat.key === val)?.value || val,
+                    }))}
+                    onChange={(options) => field.onChange(options.map((opt) => opt.value))}
+                    className="mb-4"
+                  />
+                )}
+              />
+              {errors.tags && <p className="text-red-600 text-sm">{errors.tags.message}</p>}
+            </>
+          )}
+
+          <Controller
+            name="src_from"
             control={control}
             render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {BLOG_CATEGORIES.map((categoryItem) => (
-                    <SelectItem key={categoryItem.key} value={categoryItem.key}>
-                      {categoryItem.value}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                {...field}
+                type="text"
+                placeholder="Source (Optional)"
+                className="mb-4 border-none outline-none focus:ring-0"
+                onChange={(e) => field.onChange(e.target.value)}
+              />
             )}
           />
-          <div className="flex items-center mb-6">
+
+          <div className="flex flex-col items-start mb-6">
             <UploadButton
+              endpoint="imageUploader"
               content={{
                 button: (
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <PlusCircle className="h-4 w-4 text-white" />
-                    <span className="text-[12px]">Add Cover Image</span>
+                    <span className="text-xs">Add Cover Image</span>
                   </div>
                 ),
               }}
-              appearance={{
-                allowedContent: {
-                  display: "none",
-                },
-              }}
               className="mt-4 ut-button:bg-black ut-button:ut-readying:bg-black"
-              endpoint="imageUploader"
               onClientUploadComplete={(res) => {
                 if (res && res[0]) {
-                  setValue("coverImage", res[0].url);
-                  toast({
-                    title: "Success",
-                    description: "Image uploaded successfully",
-                  });
+                  setValue("banner_link", res[0].url);
+                  toast({ title: "Success", description: "Image uploaded" });
                 }
               }}
               onUploadError={(error) => {
-                // Do something with the error.
-                toast({
-                  title: "Error",
-                  description: `Upload Failed: ${error.message}`,
-                  varaint: "destructive",
-                });
+                toast({ title: "Error", description: error.message, variant: "destructive" });
               }}
             />
-          </div>
-          {quillLoaded && (
-            <Controller
-              name="content"
-              control={control}
-              render={({ field }) => (
-                <ReactQuill
-                  ref={quillRef}
-                  theme="snow"
-                  modules={modules}
-                  {...field}
-                  onChange={(content) => field.onChange(content)}
-                  placeholder="Write your story..."
-                  className="quill-editor"
+            {bannerLink && (
+              <div className="mt-4 w-full">
+                <img
+                  src={bannerLink}
+                  alt="Uploaded Banner"
+                  className="w-full max-h-[300px] object-cover rounded-lg border"
                 />
-              )}
-            />
-          )}
+              </div>
+            )}
+          </div>
+
+          <Controller
+            name="content"
+            control={control}
+            render={({ field }) => (
+              <ReactQuill
+                ref={quillRef}
+                theme="snow"
+                value={field.value.join("\n")}
+                onChange={(val) => {
+                  const lines = val.split("\n").filter((line) => line.trim() !== "");
+                  field.onChange(lines);
+                }}
+                placeholder="Write your story..."
+                className="quill-editor"
+              />
+            )}
+          />
+          {errors.content && <p className="text-red-600 text-sm">{errors.content.message}</p>}
         </form>
       </main>
     </div>

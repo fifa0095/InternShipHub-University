@@ -1,7 +1,8 @@
-import { getBlogPostsAction } from "@/actions/blog";
 import HomeComponent from "@/components/home";
 
 export default async function Home() {
-  const posts = await getBlogPostsAction();
-  return <HomeComponent posts={posts.posts} />;
+  const response = await fetch("http://localhost:8080/api/getAllBlog");
+  const posts = await response.json();
+
+  return <HomeComponent posts={posts} />;
 }

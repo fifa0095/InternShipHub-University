@@ -1,5 +1,5 @@
 "use server";
-
+import mongoose from "mongoose";
 import { loginRules } from "@/lib/arcjet";
 import connectToDatabase from "@/lib/db";
 import User from "@/models/User";
@@ -79,7 +79,7 @@ export async function loginUserAction(formData) {
     }
 
     await connectToDatabase();
-
+    console.log("📌 Database Name:", mongoose.connection.name);
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
       return {

@@ -8,7 +8,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
-import { registerUserAction } from "@/actions/register";
 import { useRouter } from "next/navigation";
 
 const schema = z.object({
@@ -34,16 +33,21 @@ function RegisterForm() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      Object.keys(data).forEach((key) => formData.append(key, data[key]));
-      const result = await registerUserAction(formData);
-      console.log(result, "result");
+      // Send POST request to the register API
+      const result = await fetch("http://localhost:8080/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data), // Send data as JSON
+      }).then((res) => res.json());
+  
       if (result.success) {
         toast({
-          title: "Registration succesful",
+          title: "Registration successful",
           description: result.success,
         });
-        router.push("/login");
+        router.push("/login"); // Redirect to login page after successful registration
       } else {
         throw new Error(result.error || "Something went wrong!");
       }
@@ -58,7 +62,7 @@ function RegisterForm() {
       setIsLoading(false);
     }
   };
-
+  
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-4">

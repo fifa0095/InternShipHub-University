@@ -6,7 +6,7 @@ import { createUploadthing } from "uploadthing/next";
 const fn = createUploadthing();
 
 export const ourFileRouter = {
-  imageUploader: fn({ image: { maxFileSize: "4MB" } })
+  imageUploader: fn({ image: { maxFileSize: "2MB" } })
     // เพิ่ม middleware ตรวจสอบสิทธิ์การเข้าถึง
     .middleware(async (req) => {
       const token = (await cookies()).get("token")?.value;
