@@ -1,6 +1,7 @@
 const Blog = require('../models/Blog');
 const User = require('../models/User');
 
+
 const getUsernameForBlogs = async (blogs) => {
   if (!Array.isArray(blogs)) return blogs;
 
@@ -22,32 +23,19 @@ const getUsernameForBlogs = async (blogs) => {
 
 exports.createBlog = async (req, res) => {
   try {
-      const existingBlog = await Blog.findOne({ title: req.body.title });
-
-      if (existingBlog) {
-          return res.status(400).json({ error: 'Blog with this title already exists' });
-      }
-
-      let bannerUrl = null;
-      if (req.file) {
-          bannerUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
-      }
-
-      const blogData = {
-          ...req.body,
-          banner_link: bannerUrl, // Save the image URL or base64 here
-      };
-
-      const blog = new Blog(blogData);
-      await blog.save();
-
-      res.status(201).json(blog);
+    const userblog = req.body;
+    userblog.author = userblog.author_uid;
+    delete userblog.author_uid;
+    const blog = await Blog.findByIdAndUpdate(req.body._id, req.body, { new: true });
+    if (!blog){
+      res.status(404).json({error: "blog not found" });
+    }
+    res.status(200).json(blog);
   } catch (error) {
       console.error("Error Saving Blog:", error.message);
       res.status(400).json({ error: error.message });
   }
 };
-
 
 exports.getAllBlog = async (req, res) => {
   try {
