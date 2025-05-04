@@ -125,7 +125,7 @@ function CreateBlogForm({ user }) {
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center space-x-4">
           <Avatar>
-            <AvatarImage src="https://i.pinimg.com/736x/43/0c/53/430c53ef3a97464b81b24b356ed39d32.jpg" />
+            <AvatarImage src="https://i.pinimg.com/736x/42/b5/76/42b57666dbe879a032955b85c5dcdcd5.jpg" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <p className="font-semibold">{user?.userName}</p>

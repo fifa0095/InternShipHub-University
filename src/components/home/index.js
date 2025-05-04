@@ -109,7 +109,7 @@ export default function HomeComponent({ posts: initialPosts }) {
                           src={
                             postItem?.type === "auto_news"
                               ? "https://i.pinimg.com/736x/f1/7d/db/f17ddb244e3f2f6a720e61cd3f8161fb.jpg"
-                              : "https://i.pinimg.com/736x/50/f2/91/50f2915c4f23c9643efb1c8f05020f2b.jpg"
+                              : "https://i.pinimg.com/736x/42/b5/76/42b57666dbe879a032955b85c5dcdcd5.jpg"
                           }
                           alt={postItem?.author || "Author"}
                         />
