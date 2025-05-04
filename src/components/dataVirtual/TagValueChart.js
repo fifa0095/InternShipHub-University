@@ -6,7 +6,7 @@ const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#00c49f", "#ffbb28"
 
 export default function TagValueChart({ tagValueData }) {
   return (
-    <div className="w-full h-[300px]">
+    <div className="w-full h-[300px] ">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
