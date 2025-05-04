@@ -3,6 +3,7 @@ const express = require('express');
 const connectDB = require('./config/db');
 const cors = require('cors');
 const { readdirSync } = require('fs')
+const routes = require('./routes');
 
 
 
@@ -15,7 +16,9 @@ app.use(cors())
 
 connectDB();
 
-readdirSync('./routes').map((r) => app.use('/api', require('./routes/' + r)))
+app.use("/api", routes);
+
+// readdirSync('./routes').map((r) => app.use('/api', require('./routes/' + r)))
 
 
 
