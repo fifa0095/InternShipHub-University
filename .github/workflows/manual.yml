@@ -1,0 +1,42 @@
+name: Sync Repos
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the source repository (original repo)
+      - name: Checkout source repository
+        uses: actions/checkout@v2
+
+      # Step 2: Push to the destination repository
+      - name: Push to destination repository
+        run: |
+          # Configure the Git user
+          git config --global user.email "internHUF@gmail.com"
+          git config --global user.name "InternHUF"
+          
+          # Clone the destination repository
+          git clone https://InternHUF:${{ secrets.PAT_TOKEN }}@github.com/InternHUF/mirror-internHUF.git
+          
+          # Navigate into the destination repository
+          cd mirror-internHUF
+          
+          # Add the original repository as a remote
+          git remote add InternHUF https://Tanaton.phuk:${{ secrets.PAT_TOKEN }}@github.com/fifa0095/InternShipHub-University.git
+          
+          # Update the remotes to fetch the latest changes
+          git remote update
+          
+          # Merge the main branch from the original repository into the destination repository
+          git merge InternHUF/main
+          
+          # Push the merged changes to the destination repository's main branch
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
