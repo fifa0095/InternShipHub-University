@@ -32,6 +32,8 @@ jobs:
           
           # Update the remotes to fetch the latest changes
           git remote update
+
+          git fetch InternHUF
           
           # Merge the main branch from the original repository into the destination repository
           # git merge InternHUF/main
