@@ -9,6 +9,7 @@ function Fallback() {
   return <div>Loading...</div>;
 }
 
+// ✅ ใส่ฟังก์ชันนี้ไว้ด้านบน
 async function getBlogById(slug) {
   try {
     const res = await fetch(`http://localhost:8080/api/getBlogByBlogId/${slug}`, {
@@ -41,7 +42,15 @@ export default async function BlogDetailsPage({ params }) {
 
   const cookieStore = cookies();
   const token = cookieStore.get("token")?.value;
-  const user = await verifyAuth(token);
+
+  let user = null;
+  if (token) {
+    try {
+      user = await verifyAuth(token);
+    } catch (err) {
+      console.warn("⚠️ Invalid token:", err.message);
+    }
+  }
 
   const post = data.post;
 

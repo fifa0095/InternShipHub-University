@@ -6,35 +6,36 @@ import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import CommentList from "./CommentList";
+import Link from "next/link";
 
 export default function CommentSection({ user, postId }) {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  if (!user) {
-    return <p className="text-gray-500 mt-4">You must be logged in to comment.</p>;
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!content.trim()) {
-      toast({ title: "Validation", description: "Comment cannot be empty", variant: "destructive" });
+      toast({
+        title: "Validation",
+        description: "Comment cannot be empty",
+        variant: "destructive",
+      });
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/api/comments", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_PATH + "/api/comments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           blog_id: postId,
-          uid: user.userId, // ส่ง userId
-          content: [content], // content เป็น array
+          uid: user.userId,
+          content: [content],
         }),
       });
 
@@ -49,7 +50,7 @@ export default function CommentSection({ user, postId }) {
         description: "Comment added successfully",
       });
 
-      setContent(""); // รีเซ็ตข้อความ
+      setContent("");
     } catch (err) {
       toast({
         title: "Error",
@@ -62,28 +63,42 @@ export default function CommentSection({ user, postId }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6">
-      <Textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Write a comment..."
-        rows={4}
-        className="mb-4"
-      />
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? (
-          <>
-            <Loader2 className="animate-spin h-5 w-5 mr-2" />
-            Submitting...
-          </>
-        ) : (
-          "Submit Comment"
-        )}
-      </Button>
+    <div className="mt-6">
+      {/* ฟอร์มหรือแจ้งเตือนขึ้นกับสถานะ login */}
+      {user ? (
+        <form onSubmit={handleSubmit}>
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Write a comment..."
+            rows={4}
+            className="mb-4"
+          />
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                Submitting...
+              </>
+            ) : (
+              "Submit Comment"
+            )}
+          </Button>
+        </form>
+      ) : (
+        <div className="text-gray-600 text-center p-4 border rounded-md bg-gray-50">
+          <p>
+            กรุณา{" "}
+            <Link href="/login" className="text-blue-600 underline">
+              เข้าสู่ระบบ
+            </Link>{" "}
+            เพื่อแสดงความคิดเห็น
+          </p>
+        </div>
+      )}
 
-      {/* ส่งข้อมูล user ไปให้ CommentList */}
-      
-      <CommentList postId={postId} userId={user.userId} />
-    </form>
+      {/* แสดง CommentList เสมอ */}
+      <CommentList postId={postId} userId={user?.userId} />
+    </div>
   );
 }
