@@ -3,7 +3,7 @@ const express = require('express');
 const connectDB = require('./config/db');
 const cors = require('cors');
 // const { readdirSync } = require('fs')
-const  route  = require('./routess')
+const  route  = require('./routesManager')
 
 const app = express();
 
