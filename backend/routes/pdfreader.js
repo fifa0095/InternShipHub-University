@@ -5,10 +5,9 @@ const pdfReaderController = require("../controllers/pdfreader");
 
 const router = express.Router();
 
-// Multer config
 const upload = multer({
-  dest: "uploads/",
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, 
   fileFilter: (req, file, cb) => {
     const filetypes = /pdf/;
     const mimetype = filetypes.test(file.mimetype);
@@ -24,3 +23,4 @@ const upload = multer({
 router.post("/pdfReader", upload.single("file"), pdfReaderController.upload);
 
 module.exports = router;
+

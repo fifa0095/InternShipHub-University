@@ -34,9 +34,9 @@ jobs:
           git remote update
           
           # Merge the main branch from the original repository into the destination repository
-          git merge InternHUF/main
+          # git merge InternHUF/main
           
           # Push the merged changes to the destination repository's main branch
-          git push origin main
+          git push origin main --force
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}

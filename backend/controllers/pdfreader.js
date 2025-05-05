@@ -41,27 +41,23 @@ exports.upload = async (req, res) => {
       return res.status(400).json({ error: "No file uploaded." });
     }
 
+    // Validate file type
     if (req.file.mimetype !== "application/pdf") {
-      fs.unlinkSync(req.file.path); 
       return res.status(400).json({ error: "Only .pdf files are allowed." });
     }
 
+    // Validate file size (already limited by multer, but double-checking)
     const fileSizeInMB = req.file.size / (1024 * 1024);
     if (fileSizeInMB > 5) {
-      fs.unlinkSync(req.file.path);
       return res.status(400).json({ error: "File size exceeds 5MB limit." });
     }
 
-    const pdfBuffer = fs.readFileSync(req.file.path);
-
-    const pdfData = await pdfParse(pdfBuffer);
-    const searchedPDF =resumeExtraction(pdfData.text);
+    // Use in-memory buffer directly
+    const pdfData = await pdfParse(req.file.buffer);
+    const searchedPDF = resumeExtraction(pdfData.text);
     console.log(searchedPDF);
 
-    fs.unlinkSync(req.file.path);
-
-    res.json(searchedPDF );
-
+    res.json(searchedPDF);
   } catch (error) {
     console.error("PDF parsing failed:", error);
     res.status(500).json({ error: "Failed to parse PDF." });
