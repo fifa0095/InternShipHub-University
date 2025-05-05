@@ -119,7 +119,7 @@ export default function EditBlogForm({ blog, user }) {
       <header className="flex justify-between items-center mb-8">
         <div className="flex gap-4 items-center">
           <Avatar>
-            <AvatarImage src={user?.avatar || ""} />
+            <AvatarImage src={"https://ui-avatars.com/api/?name=" + user?.userName} alt={user?.userName}/>  
             <AvatarFallback>{user?.userName?.charAt(0) || "U"}</AvatarFallback>
           </Avatar>
           <p className="font-semibold">{user?.userName}</p>

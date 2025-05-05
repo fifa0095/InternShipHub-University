@@ -31,7 +31,7 @@ function BlogDetails({ post }) {
 
         <div className="flex items-center space-x-4">
           <Avatar className="h-12 w-12">
-            <AvatarImage src="https://i.pinimg.com/736x/42/b5/76/42b57666dbe879a032955b85c5dcdcd5.jpg" />
+            <AvatarImage src={"https://ui-avatars.com/api/?name=" + post?.author} alt={post?.author}/>
             <AvatarFallback>{post?.author?.charAt(0) || "U"}</AvatarFallback>
           </Avatar>
           <div>

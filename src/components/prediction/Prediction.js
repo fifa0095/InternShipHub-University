@@ -169,7 +169,7 @@ export default function ResumePrediction({ user }) {
               <span className="relative group cursor-pointer text-blue-500">
                 📄
                 <div className="absolute bottom-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                  อัปโหลดไฟล์ PDF ที่มีข้อมูลเกี่ยวกับทักษะหรือการศึกษา เพื่อให้ระบบดึงข้อมูลอัตโนมัติ
+                  อัปโหลดไฟล์ PDF ที่มีข้อมูลเกี่ยวกับทักษะหรือการศึกษา เช่น Resume,CV เพื่อให้กรอกข้อมูลเบื้องต้นอัตโนมัติ
                 </div>
               </span>
             </label>
@@ -191,8 +191,8 @@ export default function ResumePrediction({ user }) {
 
           <div className="md:w-1/2 pl-0 md:pl-6">
             <h2 className="text-2xl font-bold mt-8">Fill in Your Information for Career Prediction</h2>
-            <p className="text-l font-semibold mb-4 text-gray-400">
-              Please enter your details so the system can suggest the most suitable career for you.
+            <p className="text-l font-medium mb-4 text-gray-600">
+            กรุณากรอกรายละเอียดของคุณเพื่อให้ระบบสามารถแนะนำอาชีพที่เหมาะสมที่สุดสำหรับคุณได้ (ภาษาอังกฤษเท่านั้น)
             </p>
 
             <label className="block mb-2 font-medium flex items-center gap-1">

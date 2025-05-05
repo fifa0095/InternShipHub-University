@@ -58,22 +58,19 @@ export default function Header({ user }) {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Avatar className="h-8 w-8 cursor-pointer">
-                        <AvatarImage src={user.avatar || DEFAULT_AVATAR_URL} />
-                        <AvatarFallback>
-                          <img
-                            src={DEFAULT_AVATAR_URL}
-                            alt="Default profile"
-                            className="rounded-full w-full h-full object-cover"
-                          />
-                        </AvatarFallback>
+                        <AvatarImage
+                            src={"https://ui-avatars.com/api/?name=" + user?.userName}
+                            alt={user?.userName}
+                          />  
+                        <AvatarFallback>Unknown</AvatarFallback>
                       </Avatar>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => router.push(`/myBlog`)}>
-                        <Search className="h-4 w-4 mr-2" />
-                        <span>My Blogs</span>
+                      <Search className="h-4 w-4" />
+                      <span>My Profile</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={handleLogout}>
                         <LogOut className="h-4 w-4 mr-2" />
