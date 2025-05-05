@@ -142,14 +142,9 @@ export default function Header({ user }) {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => router.push(`/blog/user/${user._id}`)}>
+                      <DropdownMenuItem onClick={() => router.push(`/myBlog`)}>
                       <Search className="h-4 w-4" />
-                      <span>My Blogs</span>
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem onClick={() => setIsEditProfileOpen(true)}>
-                        <Edit className="h-4 w-4" />
-                        <span>Edit Profile</span>
+                      <span>My Profile</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={handleLogout}>
                         <LogOut className="h-4 w-4" />
