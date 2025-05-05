@@ -84,7 +84,7 @@ function CreateBlogForm({ user }) {
     }
 
     try {
-      const response = await fetch(process.env.API_PATH +"/api/createBlog", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/createBlog", {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({

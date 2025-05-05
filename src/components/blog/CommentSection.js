@@ -26,7 +26,7 @@ export default function CommentSection({ user, postId }) {
 
     setIsLoading(true);
     try {
-      const response = await fetch(process.env.API_PATH + "/api/comments", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_PATH + "/api/comments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

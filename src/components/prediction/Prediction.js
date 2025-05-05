@@ -37,7 +37,7 @@ export default function ResumePrediction({ user }) {
     formData.append("file", form.file);
 
     try {
-      const response = await fetch(process.env.API_PATH +"/api/pdfReader", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/pdfReader", {
         method: "POST",
         body: formData,
       });
@@ -71,7 +71,7 @@ export default function ResumePrediction({ user }) {
     };
 
     try {
-      const response = await fetch(process.env.API_PATH +"/api/predict", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(jsonData),

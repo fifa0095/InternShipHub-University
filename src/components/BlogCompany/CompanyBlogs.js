@@ -15,7 +15,7 @@ export default function CompanyBlogsComponent() {
     // ดึงข้อมูลจาก API
     const fetchData = async () => {
       try {
-        const response = await fetch(process.env.API_PATH +"/api/getReview");
+        const response = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/getReview");
         const data = await response.json();
         setPosts(data); // เก็บข้อมูลที่ได้จาก API
       } catch (error) {

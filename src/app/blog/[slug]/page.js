@@ -11,7 +11,7 @@ function Fallback() {
 
 async function getBlogById(slug) {
   try {
-    const res = await fetch(`${process.env.API_PATH}/api/getBlogByBlogId/${slug}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/getBlogByBlogId/${slug}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

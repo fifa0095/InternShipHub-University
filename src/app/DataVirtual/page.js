@@ -15,7 +15,7 @@ export default function DataVirtualization() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(process.env.API_PATH + "/api/getAllBlog");
+        const response = await fetch(process.env.NEXT_PUBLIC_API_PATH + "/api/getAllBlog");
         const blogs = await response.json();
         setBlogs(blogs); // ✅ เก็บ raw data เอาไว้ใช้ใน chart component
 

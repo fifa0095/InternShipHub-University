@@ -5,7 +5,7 @@ const DeleteBlog = ({ blogId, onDelete }) => {
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       try {
-        const response = await fetch(`${process.env.API_PATH}/api/deleteBlog/${blogId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/deleteBlog/${blogId}`, {
           method: "DELETE",
         });
 
