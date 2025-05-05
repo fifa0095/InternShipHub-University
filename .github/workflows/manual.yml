@@ -31,12 +31,11 @@ jobs:
           git remote add InternHUF https://Tanaton.phuk:${{ secrets.PAT_TOKEN }}@github.com/fifa0095/InternShipHub-University.git
           
           # Update the remotes to fetch the latest changes
-          git remote update
-
           git fetch InternHUF
           
           # Merge the main branch from the original repository into the destination repository
-          # git merge InternHUF/main
+          git checkout main
+          git reset --hard InternHUF/main
           
           # Push the merged changes to the destination repository's main branch
           git push origin main --force
