@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { verifyAuth } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { useAuth } from "@/components/Layout/context";
 
 function Fallback() {
   return <div>Loading...</div>;
@@ -40,17 +41,15 @@ export default async function BlogDetailsPage({ params }) {
   const data = await getBlogById(slug);
   if (data.error || !data.post) notFound();
 
-  const cookieStore = cookies();
-  const token = cookieStore.get("token")?.value;
 
-  let user = null;
-  if (token) {
-    try {
-      user = await verifyAuth(token);
-    } catch (err) {
-      console.warn("⚠️ Invalid token:", err.message);
-    }
-  }
+  const { user } = useAuth()
+  // if (token) {
+  //   try {
+  //     user = useAuth()
+  //   } catch (err) {
+  //     console.warn("⚠️ Invalid token:", err.message);
+  //   }
+  // }
 
   const post = data.post;
 

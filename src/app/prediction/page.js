@@ -1,13 +1,13 @@
-import ResumePrediction from "@/components/prediction/Prediction";
+"use client"
 
-import { cookies } from "next/headers";
-import { verifyAuth } from "@/lib/auth";
+import ResumePrediction from "@/components/prediction/Prediction";
+import { useAuth } from "@/components/Layout/context";
+
 
 export default async function ResumePredictionPage() {
-  const token = (await cookies()).get("token")?.value;
-  const user = await verifyAuth(token);
+const { user } = useAuth()
 
-  console.log("token:", token);
+
   console.log("user:", user);
 
   return (

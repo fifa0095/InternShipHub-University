@@ -36,6 +36,7 @@ function CreateBlogForm({ user }) {
   const quillRef = useRef(null);
   const router = useRouter();
   const { toast } = useToast();
+  // console.log( user )
 
   const {
     control,

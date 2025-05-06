@@ -3,11 +3,14 @@ import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Key, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useAuth } from "../Layout/context";
+import { verifyAuth } from "@/lib/auth";
 
 const schema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -17,6 +20,7 @@ const schema = z.object({
 });
 
 function LoginForm() {
+  const {user, SetUserContext} = useAuth()
   const [isLoading, setIsLoading] = useState(false);
   const {
     register,
@@ -48,6 +52,10 @@ function LoginForm() {
           title: "Login successful",
           description: result.success,
         });
+        // reload
+        const to_set = await verifyAuth(result.token);
+        SetUserContext(to_set);
+      
         router.push("/"); // เปลี่ยนหน้าไปที่โฮมเพจหลังจากล็อกอินสำเร็จ
       } else {
         throw new Error(result.error || "Something went wrong");

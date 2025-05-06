@@ -28,13 +28,17 @@ import {
 } from "../ui/sheet";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import Sidebar from "../ClientSidebar/Sidebar";
+import { useAuth } from "./context";
 
 // Search schema
 const searchSchema = z.object({
   query: z.string().min(1, "Query is required"),
 });
 
-export default function Header({ user }) {
+export default function Header() {
+  const {user, SetUserContext, logout } = useAuth()
+  // console.log("header user",  user)
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
@@ -76,6 +80,7 @@ export default function Header({ user }) {
 
   async function handleLogout() {
     const result = await logoutUserAction();
+    logout()
     if (result.success) {
       router.push("/login");
     } else {
@@ -83,25 +88,7 @@ export default function Header({ user }) {
     }
   }
 
-  // Handle form submission to update profile
-  const handleEditProfileSubmit = async (data) => {
-    try {
-      // Call API to update the user's profile information (data contains new values)
-      // console.log(data); // You can send this data to an API to update user profile
-      toast({
-        title: "Profile Updated",
-        description: "Your profile has been successfully updated.",
-        variant: "success",
-      });
-      setIsEditProfileOpen(false); // Close the edit profile modal
-    } catch (e) {
-      toast({
-        title: "Error",
-        description: e.message,
-        variant: "destructive",
-      });
-    }
-  };
+
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white z-50">
