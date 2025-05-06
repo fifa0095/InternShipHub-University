@@ -148,37 +148,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Edit Profile Modal */}
-      <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
-        <DialogContent>
-          <DialogTitle>Edit Your Profile</DialogTitle>
-          <form onSubmit={handleSubmit(handleEditProfileSubmit)}>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="name">Name</label>
-                <Input
-                  id="name"
-                  {...register("name")}
-                  placeholder="Enter your name"
-                  className="mt-2"
-                />
-              </div>
-              <div>
-                <label htmlFor="email">Email</label>
-                <Input
-                  id="email"
-                  {...register("email")}
-                  placeholder="Enter your email"
-                  className="mt-2"
-                />
-              </div>
-            </div>
-            <div className="mt-4 flex justify-end">
-              <Button type="submit">Save Changes</Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+
 
       {/* Search Results Sheet */}
       {/* <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
