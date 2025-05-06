@@ -133,10 +133,38 @@ exports.getCountingData = async (req, res) => {
       delete provinceCounts[alias];
     });
 
+
+    // Quarter 
+    const blogCounts = await Blog.aggregate([
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            quarter: {
+              $ceil: { $divide: [{ $month: "$createdAt" }, 3] }
+            }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.quarter": 1
+        }
+      }
+    ]);
+
+    const quarterCounts = blogCounts.map(item => ({
+      label: `Q${item._id.quarter} ${item._id.year}`,
+      count: item.count
+    }));
+
     return res.status(200).json({
       jobCounts,
       skillCounts,
       provinceCounts,
+      quarterCounts
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
