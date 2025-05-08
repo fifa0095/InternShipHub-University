@@ -33,7 +33,7 @@ export default function CompanyBlogsComponent() {
       <main className="w-full px-4 sm:px-10 lg:px-16 xl:px-24 pt-20 ">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-4xl font-bold text-gray-800 flex items-center gap-2">
-            <BuildingIcon className="w-8 h-8 text-blue-500" /> Company Reviews
+            <BuildingIcon className="w-8 h-8 text-blue-500" /> Explore Company
           </h2>
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-500">View:</span>
@@ -92,7 +92,7 @@ export default function CompanyBlogsComponent() {
                         <div className="flex items-center space-x-2 mb-2">
                           <BuildingIcon className="h-5 w-5 text-blue-500" />
                           <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
-                            Company Review
+                            Explore Company
                           </span>
                         </div>
                       )}

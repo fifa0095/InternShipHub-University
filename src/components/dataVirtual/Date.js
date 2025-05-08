@@ -12,7 +12,7 @@ export default function TimelineGraph({ timelineData }) {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="postCount" stroke="#8884d8" />
+          <Line type="monotone" dataKey="postCount" stroke="#8884d8"  />
         </LineChart>
       </ResponsiveContainer>
     </div>

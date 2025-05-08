@@ -36,6 +36,7 @@ function CreateBlogForm({ user }) {
   const quillRef = useRef(null);
   const router = useRouter();
   const { toast } = useToast();
+  // console.log( user )
 
   const {
     control,
@@ -70,6 +71,7 @@ function CreateBlogForm({ user }) {
 
   const onBlogSubmit = async (data) => {
     setIsLoading(true);
+    console.log("data :", data);
 
     const companyNameToUse =
       data.company_name === "other" ? otherCompanyName : data.company_name;

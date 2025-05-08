@@ -1,21 +1,20 @@
+"use client";
+
 import EditAccount from "@/components/account/EditAccount";
 import MyBlogs from "@/components/blog/MyBlogs";
-import { cookies } from "next/headers";
-import { verifyAuth } from "@/lib/auth";
+import { useAuth } from "@/components/Layout/context";
 
-export default async function MyBlogsPage() {
-  const token = (await cookies()).get("token")?.value;
-
-  const user = await verifyAuth(token);
+export default function MyBlogsPage() {
+  const { user } = useAuth();
   const uid = user?.userId;
-  console.log("user :",user)
-  console.log("user id :",uid)
 
+  console.log("user:", user);
+  console.log("user id:", uid);
 
   return (
     <>
       <EditAccount user={user} />
-      <MyBlogs uid={uid}  />
+      <MyBlogs uid={uid} />
     </>
   );
 }

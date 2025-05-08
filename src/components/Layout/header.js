@@ -17,11 +17,15 @@ import { logoutUserAction } from "@/actions/logout";
 const DEFAULT_AVATAR_URL =
   "https://i.pinimg.com/736x/42/b5/76/42b57666dbe879a032955b85c5dcdcd5.jpg";
 
-export default function Header({ user }) {
+export default function Header() {
+  const {user, SetUserContext, logout } = useAuth()
+  // console.log("header user",  user)
+
   const router = useRouter();
 
   async function handleLogout() {
     const result = await logoutUserAction();
+    logout()
     if (result.success) {
       router.push("/login");
     } else {

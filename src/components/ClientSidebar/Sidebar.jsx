@@ -35,10 +35,10 @@ const Sidebar = () => {
             }`}
           >
             <HomeIcon className="w-5 h-5" />
-            <span className="ml-3">Home</span>
+            <span className="ml-3">All Blog</span>
           </Link>
 
-          <Link
+          {/* <Link
             href="/blog/create"
             className={`flex items-center px-5 py-3 rounded-r-full transition ${
               pathname === "/blog/create" ? "bg-black text-white" : "hover:bg-gray-100"
@@ -46,17 +46,9 @@ const Sidebar = () => {
           >
             <FilePlusIcon className="w-5 h-5" />
             <span className="ml-3">Add Blogs</span>
-          </Link>
+          </Link> */}
 
-          <Link
-            href="/prediction"
-            className={`flex items-center px-5 py-3 rounded-r-full transition ${
-              pathname === "/prediction" ? "bg-black text-white" : "hover:bg-gray-100"
-            }`}
-          >
-            <BrainIcon className="w-5 h-5" />
-            <span className="ml-3">ML Prediction</span>
-          </Link>
+
 
           <Link
             href="/companies"
@@ -69,16 +61,26 @@ const Sidebar = () => {
           </Link>
 
           <Link
+            href="/prediction"
+            className={`flex items-center px-5 py-3 rounded-r-full transition ${
+              pathname === "/prediction" ? "bg-black text-white" : "hover:bg-gray-100"
+            }`}
+          >
+            <BrainIcon className="w-5 h-5" />
+            <span className="ml-3">Find Career</span>
+          </Link>
+
+          <Link
             href="/DataVirtual"
             className={`flex items-center px-5 py-3 rounded-r-full transition ${
               pathname === "/DataVirtual" ? "bg-black text-white" : "hover:bg-gray-100"
             }`}
           >
             <DatabaseIcon className="w-5 h-5" />
-            <span className="ml-3">Data Virtual</span>
+            <span className="ml-3">Data Visualize</span>
           </Link>
 
-          <Link
+          {/* <Link
             href="/myBlog"
             className={`flex items-center px-5 py-3 rounded-r-full transition ${
               pathname === "/myBlog" ? "bg-black text-white" : "hover:bg-gray-100"
@@ -86,7 +88,7 @@ const Sidebar = () => {
           >
             <DatabaseIcon className="w-5 h-5" />
             <span className="ml-3">My Blogs</span>
-          </Link>
+          </Link> */}
         </nav>
       </div>
     </div>
