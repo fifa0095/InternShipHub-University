@@ -5,6 +5,7 @@ import PredictLog from "./PredictLog";
 import PredictList from "./PredictList";
 import { jobInfo } from "@/Assets/assets";
 import JobInfoCard from "./JobInfo";
+import { FaSpinner } from "react-icons/fa";
 
 export default function ResumePrediction({ user }) {
   const [form, setForm] = useState({
@@ -116,7 +117,10 @@ export default function ResumePrediction({ user }) {
     <div className="py-10 bg-gray-100 relative">
       {loading && (
         <div className="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-lg font-medium">Loading...</div>
+          <div className="flex flex-col items-center justify-center">
+            <FaSpinner className="animate-spin text-blue-600 text-4xl mb-4" />
+            <div className="text-lg font-medium text-gray-700">กำลังวิเคราะห์ข้อมูล...</div>
+          </div>
         </div>
       )}
 
@@ -154,7 +158,7 @@ export default function ResumePrediction({ user }) {
 
       <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         <h2 className="text-5xl font-bold text-gray-800 flex items-center gap-2">
-          <span className="text-blue-600">🔮</span> Resume Prediction
+          <span className="text-blue-600">🔮</span> Find Career
         </h2>
       </header>
 
@@ -190,16 +194,16 @@ export default function ResumePrediction({ user }) {
           </div>
 
           <div className="md:w-1/2 pl-0 md:pl-6">
-            <h2 className="text-2xl font-bold mt-8">Fill in Your Information for Career Prediction</h2>
+            <h2 className="text-2xl font-bold mt-8">Fill in Your Information for Find Career</h2>
             <p className="text-l font-medium mb-4 text-gray-600">
-            กรุณากรอกรายละเอียดของคุณเพื่อให้ระบบสามารถแนะนำอาชีพที่เหมาะสมที่สุดสำหรับคุณได้ (ภาษาอังกฤษเท่านั้น)
+            กรุณากรอกรายละเอียดของคุณ ตามหัวข้อที่กำหนดเพื่อให้ระบบสามารถแนะนำอาชีพที่เหมาะสมที่สุดสำหรับคุณได้ (ภาษาอังกฤษเท่านั้น)
             </p>
 
             <label className="block mb-2 font-medium flex items-center gap-1">
               Skill *
               <span className="relative group cursor-pointer text-blue-500">
                 ℹ️
-                <div className="absolute bottom-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                <div className="absolute right-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
                   ระบุทักษะที่คุณมี เช่น JavaScript, Python, Excel ฯลฯ
                 </div>
               </span>

@@ -23,7 +23,7 @@ const blogPostSchema = z.object({
   title: z.string().min(1, "Title is required"),
   company_name: z.string().min(1, "Company name is required"),
   content: z.array(z.string()).min(1, "Content is required"),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()).min(1, "At least one tag is required"),
   src_from: z.string().optional(),
   banner_link: z.string().optional(),
   type: z.string().optional(),
@@ -36,6 +36,7 @@ function CreateBlogForm({ user }) {
   const quillRef = useRef(null);
   const router = useRouter();
   const { toast } = useToast();
+  // console.log( user )
 
   const {
     control,
@@ -70,6 +71,7 @@ function CreateBlogForm({ user }) {
 
   const onBlogSubmit = async (data) => {
     setIsLoading(true);
+    console.log("data :", data);
 
     const companyNameToUse =
       data.company_name === "other" ? otherCompanyName : data.company_name;

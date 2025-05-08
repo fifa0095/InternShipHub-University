@@ -1,15 +1,8 @@
+// app/blog/[slug]/page.jsx หรือ .tsx (ไม่มี use client)
 import BlogDetails from "@/components/blog/BlogDeatils";
-import CommentSection from "@/components/blog/CommentSection";
-import { cookies } from "next/headers";
-import { verifyAuth } from "@/lib/auth";
+import ClientCommentSection from "./ClientCommentSection"; // 👈 สร้าง Client Wrapper
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 
-function Fallback() {
-  return <div>Loading...</div>;
-}
-
-// ✅ ใส่ฟังก์ชันนี้ไว้ด้านบน
 async function getBlogById(slug) {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/getBlogByBlogId/${slug}`, {
@@ -40,24 +33,12 @@ export default async function BlogDetailsPage({ params }) {
   const data = await getBlogById(slug);
   if (data.error || !data.post) notFound();
 
-  const cookieStore = cookies();
-  const token = cookieStore.get("token")?.value;
-
-  let user = null;
-  if (token) {
-    try {
-      user = await verifyAuth(token);
-    } catch (err) {
-      console.warn("⚠️ Invalid token:", err.message);
-    }
-  }
-
   const post = data.post;
 
   return (
-    <Suspense fallback={<Fallback />}>
+    <>
       <BlogDetails post={post} />
-      <CommentSection user={user} postId={post._id} />
-    </Suspense>
+      <ClientCommentSection postId={post._id} /> {/* 👈 ย้าย useAuth ไปข้างใน */}
+    </>
   );
 }

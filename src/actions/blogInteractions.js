@@ -2,7 +2,7 @@
 import { commentRules, searchRules } from "@/lib/arcjet";
 import { verifyAuth } from "@/lib/auth";
 import connectToDatabase from "@/lib/db";
-import BlogPost from "@/models/BlogPost";
+// import BlogPost from "@/models/BlogPost";
 import { request } from "@arcjet/next";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
