@@ -52,7 +52,7 @@ export default function EditAccount({ user }) {
     console.log("📤 Data sent to API:", bodyData);
 
     try {
-      const res = await fetch(`http://localhost:8080/api/updateUser`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/updateUser`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
