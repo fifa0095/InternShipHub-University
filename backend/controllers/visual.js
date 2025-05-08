@@ -69,20 +69,21 @@ exports.getCountingData = async (req, res) => {
   try {
     const blogs = await Blog.find();
 
-    const jobCounts = {};
-    const skillCounts = {};
+    const jobSkillCounts = {};
     const provinceCounts = {};
 
     for (const [job, skills] of Object.entries(JOB_SKILL_KEYWORDS)) {
       if (job === "NODATA") continue;
-      jobCounts[job] = 0;
+      jobSkillCounts[job] = {
+        count: 0,
+        skills: {}
+      };
       for (const skill of skills) {
-        skillCounts[skill.toLowerCase()] = 0;
+        jobSkillCounts[job].skills[skill.toLowerCase()] = 0;
       }
     }
 
     const allProvinces = [...TH_PROVINCES, ...BANGKOK_ALIASES];
-
     for (const province of allProvinces) {
       provinceCounts[province] = 0;
     }
@@ -106,12 +107,12 @@ exports.getCountingData = async (req, res) => {
         if (job === "NODATA") continue;
 
         const matched = skills.some((kw) => lowerText.includes(kw.toLowerCase()));
-        if (matched) jobCounts[job]++;
+        if (matched) jobSkillCounts[job].count++;
 
         skills.forEach((kw) => {
           const skill = kw.toLowerCase();
           if (lowerText.includes(skill)) {
-            skillCounts[skill]++;
+            jobSkillCounts[job].skills[skill]++;
           }
         });
       }
@@ -121,7 +122,7 @@ exports.getCountingData = async (req, res) => {
           provinceCounts[province]++;
         }
       });
-      
+
       BANGKOK_ALIASES.forEach((alias) => {
         if (lowerText.includes(alias.toLowerCase())) {
           provinceCounts["กรุงเทพฯ"]++;
@@ -133,8 +134,6 @@ exports.getCountingData = async (req, res) => {
       delete provinceCounts[alias];
     });
 
-
-    // Quarter 
     const blogCounts = await Blog.aggregate([
       {
         $group: {
@@ -161,8 +160,7 @@ exports.getCountingData = async (req, res) => {
     }));
 
     return res.status(200).json({
-      jobCounts,
-      skillCounts,
+      jobSkillCounts,
       provinceCounts,
       quarterCounts
     });
