@@ -94,7 +94,7 @@ export default function EditBlogForm({ blog, user }) {
     console.log("✏️ Updating blog with:", updatedData);
 
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/updateBlog", {
+      const res = await fetch("http://localhost:8080/api/updateBlog", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),

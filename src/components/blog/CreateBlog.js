@@ -23,7 +23,7 @@ const blogPostSchema = z.object({
   title: z.string().min(1, "Title is required"),
   company_name: z.string().min(1, "Company name is required"),
   content: z.array(z.string()).min(1, "Content is required"),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()).min(1, "At least one tag is required"),
   src_from: z.string().optional(),
   banner_link: z.string().optional(),
   type: z.string().optional(),
@@ -86,7 +86,7 @@ function CreateBlogForm({ user }) {
     }
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/createBlog", {
+      const response = await fetch("http://localhost:8080/api/createBlog", {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({

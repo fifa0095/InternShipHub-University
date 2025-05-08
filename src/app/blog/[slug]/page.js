@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 
 async function getBlogById(slug) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/getBlogByBlogId/${slug}`, {
+    const res = await fetch(`http://localhost:8080/api/getBlogByBlogId/${slug}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

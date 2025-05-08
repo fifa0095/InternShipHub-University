@@ -15,11 +15,8 @@ import developer from "./Dev.png"
 import tester from "./QA__Tester.png"
 import security from "./Security.png"
 import designer from "./webdesigner.png"
-import user from "./user.png"
 
 export const assets = {
- user,
-
   // 🔧 โลโก้บริษัท (สำหรับ company_name)
   ptt,
   cpall,

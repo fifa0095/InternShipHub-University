@@ -14,7 +14,7 @@ export default function MyBlogs({ uid }) {
 
     const fetchMyBlogs = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/getBlogByUid/${uid}`);
+        const res = await fetch(`http://localhost:8080/api/getBlogByUid/${uid}`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.error || "Failed to fetch blogs");

@@ -11,7 +11,7 @@ export default function PredictList({ keyword }) {
 
     const fetchBlogs = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/search/${encodeURIComponent(keyword)}`);
+        const res = await fetch(`http://localhost:8080/api/search/${encodeURIComponent(keyword)}`);
         const data = await res.json();
         setBlogs(data || []);
       } catch (error) {

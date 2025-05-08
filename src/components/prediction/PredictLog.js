@@ -15,7 +15,7 @@ export default function PredictLog({ uid }) {
 
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/getResume/${uid}`);
+        const res = await fetch(`http://localhost:8080/api/getResume/${uid}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to fetch history");
         setHistory(data);
@@ -37,7 +37,7 @@ export default function PredictLog({ uid }) {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_PATH}/api/search/${encodeURIComponent(item.predicted_job)}`
+        `http://localhost:8080/api/search/${encodeURIComponent(item.predicted_job)}`
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch blogs");

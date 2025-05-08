@@ -9,14 +9,14 @@ export default function Tags({ tagsData }) {
 
   return (
     <div className="flex justify-center items-center bg-white shadow-md rounded-xl p-6">
-      <ResponsiveContainer width="100%" height={500}>
+      <ResponsiveContainer width="80%" height={400}>
         <PieChart>
           <Pie
             data={tagsData}
             cx="50%"
             cy="50%"
             labelLine={false}
-            outerRadius={140}
+            outerRadius={150}
             fill="#8884d8"
             dataKey="value"
             label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
