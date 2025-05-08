@@ -35,7 +35,7 @@ function RegisterForm() {
   const onValid = async (data) => {
     setIsLoading(true);
     try {
-      const result = await fetch(process.env.NEXT_PUBLIC_API_PATH + "/api/register", {
+      const result = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 export default async function CompaniesPage() {
   try {
-    const response = await fetch(process.env.NEXT_PUBLIC_API_PATH + "/api/getReview");
+    const response = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/getReview");
 
     if (!response.ok) {
       throw new Error("Failed to fetch blog data");
