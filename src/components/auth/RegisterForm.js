@@ -11,11 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
 const schema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 chracters." }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 chracters long." }),
+    .min(8, { message: "Password must be at least 8 characters long." }),
 });
 
 function RegisterForm() {
@@ -27,32 +27,32 @@ function RegisterForm() {
   } = useForm({
     resolver: zodResolver(schema),
   });
+
   const { toast } = useToast();
   const router = useRouter();
 
-  const onSubmit = async (data) => {
+  // ✅ เมื่อ valid แล้ว ส่งข้อมูลไป backend
+  const onValid = async (data) => {
     setIsLoading(true);
     try {
-      // Send POST request to the register API
       const result = await fetch("http://localhost:8080/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data), // Send data as JSON
+        body: JSON.stringify(data),
       }).then((res) => res.json());
-  
+
       if (result.success) {
         toast({
           title: "Registration successful",
           description: result.success,
         });
-        router.push("/login"); // Redirect to login page after successful registration
+        router.push("/login");
       } else {
         throw new Error(result.error || "Something went wrong!");
       }
     } catch (e) {
-      console.log(e);
       toast({
         title: "Registration failed",
         description: e.message,
@@ -62,9 +62,21 @@ function RegisterForm() {
       setIsLoading(false);
     }
   };
-  
+
+  // ❗️ เมื่อ invalid แล้วแสดง toast ตาม field ที่ error
+  const onInvalid = (errors) => {
+    const firstError = Object.values(errors)[0];
+    if (firstError?.message) {
+      toast({
+        title: "Validation Error",
+        description: firstError.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onValid, onInvalid)}>
       <div className="space-y-4">
         <div className="relative">
           <User className="absolute left-3 top-2 h-5 w-5 text-gray-400" />

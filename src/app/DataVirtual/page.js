@@ -1,56 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CompanyBarChart from "@/components/dataVirtual/Company";
-import TimelineGraph from "@/components/dataVirtual/Date";
-import TagInteractiveCharts from "@/components/dataVirtual/TagInteractiveCharts"; // ✅ import ใหม่
+
+import JobSkillInteractiveCharts from "@/components/dataVirtual/JobSkillInteractiveCharts";
+import TagInteractiveCharts from "@/components/dataVirtual/TagInteractiveCharts";
+import QuarterBarChart from "@/components/dataVirtual/QuarterBarChart";
 
 export default function DataVirtualization() {
-  const [companyData, setCompanyData] = useState([]);
-  const [timelineData, setTimelineData] = useState([]);
-  const [blogs, setBlogs] = useState([]);
+  const [quarterData, setQuarterData] = useState([]);
+  const [jobSkillCounts, setJobSkillCounts] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchVisualizeData = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:8080/api/getAllBlog");
-        const blogs = await response.json();
-        setBlogs(blogs); // ✅ เก็บ raw data เอาไว้ใช้ใน chart component
-
-        const companyWeightCounts = {};
-        const datePostCounts = {};
-
-        blogs.forEach(blog => {
-          const companyName = blog.company_name;
-          const createdAt = new Date(blog.createdAt).toLocaleDateString();
-
-          if (companyName) {
-            companyWeightCounts[companyName] = (companyWeightCounts[companyName] || 0) + 1;
-          }
-
-          if (createdAt) {
-            datePostCounts[createdAt] = (datePostCounts[createdAt] || 0) + 1;
-          }
-        });
-
-        const companyData = Object.entries(companyWeightCounts).map(([name, weight]) => ({ name, weight }));
-
-        const timelineData = Object.entries(datePostCounts)
-          .map(([date, postCount]) => ({ date, postCount }))
-          .sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        setCompanyData(companyData);
-        setTimelineData(timelineData);
+        const res = await fetch("https://intern-huf-api.vercel.app/api/getVisaulizeData");
+        const data = await res.json();
+        setQuarterData(data.quarterCounts || []);
+        setJobSkillCounts(data.jobSkillCounts || {});
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching visualize data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchVisualizeData();
   }, []);
 
   return (
@@ -61,18 +37,18 @@ export default function DataVirtualization() {
         <p className="text-center text-lg text-gray-500 mt-20">กำลังโหลดข้อมูล...</p>
       ) : (
         <>
-          {/* ✅ Interactive Tags Charts */}
-          <TagInteractiveCharts blogs={blogs} />
-
-          {/* Timeline Graph */}
+          {/* ✅ กราฟวิเคราะห์สกิลตามสายงาน */}
           <div className="mt-12">
-            <h2 className="text-2xl font-bold mb-4">Posts Over Time</h2>
-            <TimelineGraph timelineData={timelineData} />
+            <h2 className="text-2xl font-bold mb-4">Job Skill Analysis</h2>
+            <JobSkillInteractiveCharts jobSkillCounts={jobSkillCounts} />
           </div>
 
-          {/* Company Bar Chart */}
-          <h2 className="text-2xl font-bold mb-4 mt-8">Company Post Distribution</h2>
-          <CompanyBarChart companyData={companyData} />
+          {/* ✅ กราฟโพสต์รายไตรมาส */}
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold mb-4">Posts by Quarter</h2>
+            <QuarterBarChart quarterData={quarterData} />
+
+          </div>
         </>
       )}
     </div>
