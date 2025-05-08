@@ -15,7 +15,7 @@ export default function DataVirtualization() {
     const fetchVisualizeData = async () => {
       try {
         setLoading(true);
-        const res = await fetch("https://intern-huf-api.vercel.app/api/getVisaulizeData");
+        const res = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/getVisaulizeData");
         const data = await res.json();
         setQuarterData(data.quarterCounts || []);
         setJobSkillCounts(data.jobSkillCounts || {});

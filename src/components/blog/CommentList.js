@@ -19,7 +19,7 @@ export default function CommentList({ postId, userId }) {
 
   async function fetchComments() {
     try {
-      const res = await fetch(`http://localhost:8080/api/comments/blog/${postId}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/comments/blog/${postId}`);
       const data = await res.json();
       setComments(data || []);
     } catch (e) {
@@ -31,7 +31,7 @@ export default function CommentList({ postId, userId }) {
 
   async function handleDelete(commentId) {
     try {
-      const res = await fetch(`http://localhost:8080/api/comments/${commentId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}/api/comments/${commentId}`, {
         method: "DELETE",
       });
 
