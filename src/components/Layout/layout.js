@@ -3,23 +3,24 @@ import Header from "./header";
 import { verifyAuth } from "@/lib/auth";
 import { AuthProvider } from "./context";
 
-
 export default async function CommonLayout({ children }) {
-  const token = (await cookies()).get("token")?.value;
-  // console.log("🔥 Token from cookies:", token);
+  const token = cookies().get("token")?.value;
+  let user = null;
 
-  // const user = await verifyAuth(token);
-  // console.log("👤 User after verifyAuth:", user);
-
+  if (token) {
+    try {
+      user = await verifyAuth(token); // 👤 ตรวจสอบ token แล้วได้ user object
+    } catch (err) {
+      console.error("Auth verify failed:", err);
+    }
+  }
 
   return (
-    <AuthProvider>
-<div className="min-h-screen bg-white">
-      
-      { <Header />}
-      {children}
-    </div>
+    <AuthProvider initialUser={user}>
+      <div className="min-h-screen bg-white">
+        <Header />
+        {children}
+      </div>
     </AuthProvider>
-    
   );
 }
