@@ -62,7 +62,8 @@ exports.getBlogByPage = async (req, res) => {
       const blogs = await Blog.find()
         .sort({ createdAt: -1 }) // latest first
         .skip(skip)
-        .limit(limit);
+        .limit(limit)
+        .lean();;
 
       const enrichedBlogs = await getUsernameForBlogs(blogs);
   
