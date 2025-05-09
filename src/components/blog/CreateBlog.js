@@ -31,12 +31,12 @@ const blogPostSchema = z.object({
 
 function CreateBlogForm({ user }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false); // 👈 เพิ่มสถานะโหลด
   const [isOtherCompany, setIsOtherCompany] = useState(false);
   const [otherCompanyName, setOtherCompanyName] = useState("");
   const quillRef = useRef(null);
   const router = useRouter();
   const { toast } = useToast();
-  // console.log( user )
 
   const {
     control,
@@ -71,10 +71,7 @@ function CreateBlogForm({ user }) {
 
   const onBlogSubmit = async (data) => {
     setIsLoading(true);
-    console.log("data :", data);
-
-    const companyNameToUse =
-      data.company_name === "other" ? otherCompanyName : data.company_name;
+    const companyNameToUse = data.company_name === "other" ? otherCompanyName : data.company_name;
 
     let tagsObject = {};
     if (data.type === "company_reviews") {
@@ -86,12 +83,13 @@ function CreateBlogForm({ user }) {
     }
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/createBlog", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_PATH + "/api/createBlog", {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({
           ...data,
           company_name: companyNameToUse,
+          src_from: data.src_from?.trim() === "" ? "-" : data.src_from,
           content: Array.isArray(data.content) ? data.content : [data.content],
           tags: tagsObject,
           type: user?.type === "admin" ? data.type || "user_blogs" : "user_blogs",
@@ -103,7 +101,7 @@ function CreateBlogForm({ user }) {
       if (response.status === 201) {
         toast({
           title: "Success",
-          description: "Your blog has been successfully published! You can view it now.",
+          description: "Your blog has been successfully published!",
           variant: "success",
         });
         router.push("/");
@@ -127,7 +125,7 @@ function CreateBlogForm({ user }) {
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center space-x-4">
           <Avatar>
-            <AvatarImage src={"https://ui-avatars.com/api/?name=" + user?.userName} alt={user?.userName}/>  
+            <AvatarImage src={"https://ui-avatars.com/api/?name=" + user?.userName} alt={user?.userName} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <p className="font-semibold">{user?.userName}</p>
@@ -260,16 +258,32 @@ function CreateBlogForm({ user }) {
                 ),
               }}
               className="mt-4 ut-button:bg-black ut-button:ut-readying:bg-black"
+              onUploadBegin={() => setIsUploading(true)} // 👈 เริ่มโหลด
               onClientUploadComplete={(res) => {
+                setIsUploading(false); // ✅ เสร็จแล้ว
                 if (res && res[0]) {
                   setValue("banner_link", res[0].url);
                   toast({ title: "Success", description: "Image uploaded" });
                 }
               }}
               onUploadError={(error) => {
+                setIsUploading(false); // ❌ error
                 toast({ title: "Error", description: error.message, variant: "destructive" });
               }}
             />
+            {isUploading && (
+              <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
+                <svg className="animate-spin h-4 w-4 text-gray-500" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
+                </svg>
+                Uploading image...
+              </div>
+            )}
             {bannerLink && (
               <div className="mt-4 w-full">
                 <img

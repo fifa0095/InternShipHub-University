@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import JobSkillInteractiveCharts from "@/components/dataVirtual/JobSkillInteractiveCharts";
-import TagInteractiveCharts from "@/components/dataVirtual/TagInteractiveCharts";
+
 import QuarterBarChart from "@/components/dataVirtual/QuarterBarChart";
 
 export default function DataVirtualization() {

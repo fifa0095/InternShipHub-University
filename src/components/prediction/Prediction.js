@@ -16,6 +16,7 @@ export default function ResumePrediction({ user }) {
   });
 
   const [loading, setLoading] = useState(false);
+  const [readingPdf, setReadingPdf] = useState(false);
   const [result, setResult] = useState(null);
   const [pdfText, setPdfText] = useState("");
 
@@ -34,14 +35,18 @@ export default function ResumePrediction({ user }) {
       return;
     }
 
+    setReadingPdf(true);
     const formData = new FormData();
     formData.append("file", form.file);
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/pdfReader", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_API_PATH + "/api/pdfReader",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Failed to read PDF");
@@ -57,6 +62,8 @@ export default function ResumePrediction({ user }) {
     } catch (error) {
       console.error("❌ PDF Read Error:", error);
       toast.error("Failed to read PDF");
+    } finally {
+      setReadingPdf(false);
     }
   };
 
@@ -72,11 +79,14 @@ export default function ResumePrediction({ user }) {
     };
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_PATH +"/api/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(jsonData),
-      });
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_API_PATH + "/api/predict",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(jsonData),
+        }
+      );
 
       const predictionResult = await response.json();
 
@@ -125,35 +135,32 @@ export default function ResumePrediction({ user }) {
       )}
 
       {result && (
-          <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
-            <div className="bg-white p-8 rounded-lg shadow-lg max-w-5xl w-full relative overflow-hidden max-h-[90vh]">
-              <button
-                onClick={closeModal}
-                className="absolute top-2 right-2 text-gray-500 hover:text-black"
-              >
-                ✖
-              </button>
+        <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-5xl w-full relative overflow-hidden max-h-[90vh]">
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-2 text-gray-500 hover:text-black"
+            >
+              ✖
+            </button>
 
-              <div className="flex flex-col md:flex-row gap-8 h-[75vh] overflow-hidden">
-                {/* Left: Job Info Sticky */}
-                <div className="flex-1 flex flex-col items-center text-center sticky top-0 self-start">
-                  {covertResult && jobInfo[covertResult] ? (
-                    <JobInfoCard job={jobInfo[covertResult]} />
-                  ) : (
-                    <h2 className="text-2xl font-bold text-gray-800">
-                      Prediction: {typeof result === "string" ? result : result?.prediction || "N/A"}
-                    </h2>
-                  )}
-                </div>
+            <div className="flex flex-col md:flex-row gap-8 h-[75vh] overflow-hidden">
+              <div className="flex-1 flex flex-col items-center text-center sticky top-0 self-start">
+                {covertResult && jobInfo[covertResult] ? (
+                  <JobInfoCard job={jobInfo[covertResult]} />
+                ) : (
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    Prediction: {typeof result === "string" ? result : result?.prediction || "N/A"}
+                  </h2>
+                )}
+              </div>
 
-                {/* Right: Predict List Scrollable */}
-                <div className="flex-1 overflow-y-auto pr-2">
-                  <PredictList keyword={result?.prediction || result} />
-                </div>
+              <div className="flex-1 overflow-y-auto pr-2">
+                <PredictList keyword={result?.prediction || result} />
               </div>
             </div>
           </div>
-
+        </div>
       )}
 
       <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
@@ -170,10 +177,9 @@ export default function ResumePrediction({ user }) {
           <div className="md:w-1/2 pr-0 md:pr-6 md:border-r border-gray-300 mb-6 md:mb-0 flex flex-col items-center justify-center">
             <label className="block mb-2 font-medium flex items-center gap-1">
               Upload PDF (Optional)
-              <span className="relative group cursor-pointer text-blue-500">
-                📄
-                <div className="absolute bottom-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                  อัปโหลดไฟล์ PDF ที่มีข้อมูลเกี่ยวกับทักษะหรือการศึกษา เช่น Resume,CV เพื่อให้กรอกข้อมูลเบื้องต้นอัตโนมัติ
+              <span className="relative group cursor-pointer text-blue-500">ℹ️
+                <div className="absolute bottom-full translate-y-[-6px] left-1/2 -translate-x-1/2 hidden group-hover:flex bg-gray-800 text-white text-xs rounded py-1 px-2 z-20 w-max max-w-[250px] text-center shadow-lg">
+                  อัปโหลดไฟล์ PDF ที่มีข้อมูลเกี่ยวกับทักษะหรือการศึกษา เช่น Resume, CV
                 </div>
               </span>
             </label>
@@ -187,23 +193,24 @@ export default function ResumePrediction({ user }) {
             <button
               type="button"
               onClick={handleReadPdf}
-              className="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 mt-2"
+              disabled={readingPdf}
+              className="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 mt-2 flex items-center gap-2"
             >
-              Read PDF Text
+              {readingPdf && <FaSpinner className="animate-spin" />}
+              {readingPdf ? "Reading..." : "Read PDF Text"}
             </button>
           </div>
 
           <div className="md:w-1/2 pl-0 md:pl-6">
             <h2 className="text-2xl font-bold mt-8">Fill in Your Information for Find Career</h2>
             <p className="text-l font-medium mb-4 text-gray-600">
-            กรุณากรอกรายละเอียดของคุณ ตามหัวข้อที่กำหนดเพื่อให้ระบบสามารถแนะนำอาชีพที่เหมาะสมที่สุดสำหรับคุณได้ (ภาษาอังกฤษเท่านั้น)
+              กรุณากรอกรายละเอียดของคุณเพื่อให้ระบบสามารถแนะนำอาชีพที่เหมาะสมที่สุด (ภาษาอังกฤษเท่านั้น)
             </p>
 
             <label className="block mb-2 font-medium flex items-center gap-1">
               Skill *
-              <span className="relative group cursor-pointer text-blue-500">
-                ℹ️
-                <div className="absolute right-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+              <span className="relative group cursor-pointer text-blue-500">ℹ️
+                <div className="absolute bottom-full translate-y-[-6px] left-1/2 -translate-x-1/2 hidden group-hover:flex bg-gray-800 text-white text-xs rounded py-1 px-2 z-20 w-max max-w-[250px] text-center shadow-lg">
                   ระบุทักษะที่คุณมี เช่น JavaScript, Python, Excel ฯลฯ
                 </div>
               </span>
@@ -220,9 +227,8 @@ export default function ResumePrediction({ user }) {
 
             <label className="block mb-2 font-medium flex items-center gap-1">
               Certificate *
-              <span className="relative group cursor-pointer text-blue-500">
-                ℹ️
-                <div className="absolute bottom-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+              <span className="relative group cursor-pointer text-blue-500">ℹ️
+                <div className="absolute bottom-full translate-y-[-6px] left-1/2 -translate-x-1/2 hidden group-hover:flex bg-gray-800 text-white text-xs rounded py-1 px-2 z-20 w-max max-w-[250px] text-center shadow-lg">
                   ใส่ระดับการศึกษา หรือใบรับรอง เช่น ปริญญาตรี สาขา IT หรือ Google Certificate
                 </div>
               </span>
@@ -239,9 +245,8 @@ export default function ResumePrediction({ user }) {
 
             <label className="block mb-2 font-medium flex items-center gap-1">
               Experience *
-              <span className="relative group cursor-pointer text-blue-500">
-                ℹ️
-                <div className="absolute bottom-full mb-1 w-[220px] bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+              <span className="relative group cursor-pointer text-blue-500">ℹ️
+                <div className="absolute bottom-full translate-y-[-6px] left-1/2 -translate-x-1/2 hidden group-hover:flex bg-gray-800 text-white text-xs rounded py-1 px-2 z-20 w-max max-w-[250px] text-center shadow-lg">
                   เขียนประสบการณ์การทำงาน หรือโปรเจกต์ที่เคยทำ เช่น สร้างเว็บ React
                 </div>
               </span>

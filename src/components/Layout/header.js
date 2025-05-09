@@ -20,14 +20,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { searchPostsAction } from "@/actions/blogInteractions";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "../ui/sheet";
-import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
-import Sidebar from "../ClientSidebar/Sidebar";
 import { useAuth } from "./context";
 
 // Search schema
@@ -51,32 +43,6 @@ export default function Header() {
     resolver: zodResolver(searchSchema),
   });
 
-  async function onSearchSubmit(data) {
-    setIsLoading(true);
-    try {
-      // Filter posts based on title and content
-      const result = await searchPostsAction(data.query);
-      if (result.success) {
-        const filteredResults = result.posts.filter((post) =>
-          post.title.toLowerCase().includes(data.query.toLowerCase()) ||
-          post.content.toLowerCase().includes(data.query.toLowerCase())
-        );
-        setSearchResults(filteredResults);
-        setIsSheetOpen(true);
-        reset();
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (e) {
-      toast({
-        title: "Error",
-        description: e.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }
 
   async function handleLogout() {
     const result = await logoutUserAction();
