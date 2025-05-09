@@ -59,7 +59,9 @@ exports.getBlogByPage = async (req, res) => {
       const limit = 15;
       const skip = (page - 1) * limit;
   
-      const blogs = await Blog.find()
+      const blogs = await Blog.find({
+        type: { $in: ["auto_news", "user_blogs"] }
+      })
         .sort({ createdAt: -1 }) // latest first
         .skip(skip)
         .limit(limit)
