@@ -19,7 +19,7 @@ export default async function CompaniesPage() {
 
     // ไม่ต้องกรอง filter ใด ๆ แล้ว
     return (
-      <div className="bg-gray-100 min-h-screen py-10 px-4">
+      <div className="bg-gray-100 min-h-screen  ">
         <CompanyBlogsComponent posts={posts} />
       </div>
     );

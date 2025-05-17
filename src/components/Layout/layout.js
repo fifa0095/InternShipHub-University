@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import Header from "./header";
 import { verifyAuth } from "@/lib/auth";
 import { AuthProvider } from "./context";
+import ClientLayout from "./client-layout"; // 👈 component ที่จัดการ responsive/sidebar
 
 export default async function CommonLayout({ children }) {
   const token = cookies().get("token")?.value;
@@ -9,18 +10,15 @@ export default async function CommonLayout({ children }) {
 
   if (token) {
     try {
-      user = await verifyAuth(token); // 👤 ตรวจสอบ token แล้วได้ user object
+      user = await verifyAuth(token);
     } catch (err) {
       console.error("Auth verify failed:", err);
     }
   }
 
   return (
-    <AuthProvider initialUser={user}>
-      <div className="min-h-screen bg-white">
-        <Header />
-        {children}
-      </div>
+    <AuthProvider initialUser={user} >
+      <ClientLayout>{children}</ClientLayout>
     </AuthProvider>
   );
 }

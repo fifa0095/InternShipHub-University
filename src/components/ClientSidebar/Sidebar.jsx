@@ -1,98 +1,80 @@
 "use client";
 
-import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import {
-  HomeIcon,
-  FilePlusIcon,
-  BrainIcon,
-  BuildingIcon,
-  DatabaseIcon,
-} from "lucide-react"; // 👈 ไอคอนทั้งหมดจาก lucide
+import { XIcon, HomeIcon, BrainIcon, BuildingIcon, DatabaseIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const Sidebar = () => {
-  const [isSidebarHidden, setIsSidebarHidden] = useState(false);
+export default function Sidebar({ isOpen = true, onClose = () => {} }) {
   const pathname = usePathname();
 
-  const toggleSidebar = () => {
-    setIsSidebarHidden(!isSidebarHidden);
-  };
+  const navItems = [
+    { href: "/", icon: HomeIcon, label: "All Blog" },
+    { href: "/companies", icon: BuildingIcon, label: "Explore Company" },
+    { href: "/prediction", icon: BrainIcon, label: "Find Career" },
+    { href: "/DataVirtual", icon: DatabaseIcon, label: "Data Visualize" },
+  ];
 
   return (
-    <div>
-      {/* Sidebar */}
+    <>
+      {/* Mobile Sidebar */}
       <div
-        className={`fixed top-16 left-0 h-[calc(100%-4rem)] bg-white shadow-lg transition-transform duration-300 ease-in-out ${
-          isSidebarHidden ? "-translate-x-full" : "translate-x-0"
-        } w-64`}
+        className={cn(
+          "fixed inset-0 z-50 bg-black bg-opacity-50 md:hidden pt-20",
+          isOpen ? "block" : "hidden"
+        )}
+        onClick={onClose}
       >
-        <nav className="mt-2">
-          <Link
-            href="/"
-            className={`flex items-center px-5 py-3 rounded-r-full transition ${
-              pathname === "/" ? "bg-black text-white" : "hover:bg-gray-100"
-            }`}
-          >
-            <HomeIcon className="w-5 h-5" />
-            <span className="ml-3">All Blog</span>
-          </Link>
+        <div
+          className="absolute left-0 top-0 h-full w-64 bg-white shadow-lg p-4 pt-10"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button onClick={onClose} className="mb-4">
+            <XIcon className="w-6 h-6" />
+          </button>
+          <nav className="space-y-2">
+            {navItems.map((item) => {
+              const active = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center px-4 py-2 rounded-r-full transition",
+                    active ? "bg-black text-white" : "hover:bg-gray-100"
+                  )}
+                  onClick={onClose}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span className="ml-3">{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
 
-          {/* <Link
-            href="/blog/create"
-            className={`flex items-center px-5 py-3 rounded-r-full transition ${
-              pathname === "/blog/create" ? "bg-black text-white" : "hover:bg-gray-100"
-            }`}
-          >
-            <FilePlusIcon className="w-5 h-5" />
-            <span className="ml-3">Add Blogs</span>
-          </Link> */}
-
-
-
-          <Link
-            href="/companies"
-            className={`flex items-center px-5 py-3 rounded-r-full transition ${
-              pathname === "/companies" ? "bg-black text-white" : "hover:bg-gray-100"
-            }`}
-          >
-            <BuildingIcon className="w-5 h-5" />
-            <span className="ml-3">Explore Company</span>
-          </Link>
-
-          <Link
-            href="/prediction"
-            className={`flex items-center px-5 py-3 rounded-r-full transition ${
-              pathname === "/prediction" ? "bg-black text-white" : "hover:bg-gray-100"
-            }`}
-          >
-            <BrainIcon className="w-5 h-5" />
-            <span className="ml-3">Find Career</span>
-          </Link>
-
-          <Link
-            href="/DataVirtual"
-            className={`flex items-center px-5 py-3 rounded-r-full transition ${
-              pathname === "/DataVirtual" ? "bg-black text-white" : "hover:bg-gray-100"
-            }`}
-          >
-            <DatabaseIcon className="w-5 h-5" />
-            <span className="ml-3">Data Visualize</span>
-          </Link>
-
-          {/* <Link
-            href="/myBlog"
-            className={`flex items-center px-5 py-3 rounded-r-full transition ${
-              pathname === "/myBlog" ? "bg-black text-white" : "hover:bg-gray-100"
-            }`}
-          >
-            <DatabaseIcon className="w-5 h-5" />
-            <span className="ml-3">My Blogs</span>
-          </Link> */}
+      {/* Desktop Sidebar */}
+      <div className="hidden md:fixed md:top-0 md:left-0 md:w-64 md:h-full md:bg-white md:shadow-lg md:block p-4 pt-20">
+        <nav className="space-y-2">
+          {navItems.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center px-4 py-2 rounded-r-full transition",
+                  active ? "bg-black text-white" : "hover:bg-gray-100"
+                )}
+              >
+                <item.icon className="w-5 h-5" />
+                <span className="ml-3">{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
       </div>
-    </div>
+    </>
   );
-};
-
-export default Sidebar;
+}
