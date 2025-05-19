@@ -36,7 +36,7 @@ export default function ClientLayout({ children }) {
 
       <div className="flex-1">
         <Header onMenuClick={toggleSidebar} />
-        <main className="pt-10 md:pl-64">{children}</main>
+        <main className="pt-6 md:pl-64">{children}</main>
       </div>
     </div>
   );
